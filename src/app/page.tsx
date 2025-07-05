@@ -18,7 +18,7 @@ export default function Home() {
   const [toast, setToast] = useState("");
 
   const fetchSong = async () => {
-    const res = await fetch("/songs.json");
+    const res = await fetch("https://api.sheetbest.com/sheets/88c2b9c7-8d30-462b-ae7c-a4859aaf6955");
     const songs: Song[] = await res.json();
     const random = songs[Math.floor(Math.random() * songs.length)];
     setSong(random);
