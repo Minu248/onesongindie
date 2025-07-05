@@ -36,11 +36,32 @@ function HomeContent() {
   }, [sharedSong]);
 
   const fetchSong = async () => {
-    const res = await fetch("https://api.sheetbest.com/sheets/88c2b9c7-8d30-462b-ae7c-a4859aaf6955");
-    const songs: Song[] = await res.json();
-    const random = songs[Math.floor(Math.random() * songs.length)];
-    setSong(random);
-    setShowRandom(true);
+    try {
+      console.log("fetchSong 함수 호출됨");
+      const res = await fetch("https://api.sheetbest.com/sheets/88c2b9c7-8d30-462b-ae7c-a4859aaf6955");
+      console.log("API 응답:", res.status);
+      
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      
+      const songs: Song[] = await res.json();
+      console.log("받아온 곡 개수:", songs.length);
+      
+      if (songs.length === 0) {
+        throw new Error("곡 데이터가 없습니다");
+      }
+      
+      const random = songs[Math.floor(Math.random() * songs.length)];
+      console.log("선택된 곡:", random);
+      
+      setSong(random);
+      setShowRandom(true);
+    } catch (error) {
+      console.error("fetchSong 에러:", error);
+      setToast("곡을 불러오는 중 오류가 발생했습니다");
+      setTimeout(() => setToast(""), 3000);
+    }
   };
 
   const likeSong = () => {
