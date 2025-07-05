@@ -29,19 +29,19 @@ export default function Playlist() {
       ) : (
         <div className="w-full max-w-2xl flex flex-col gap-6">
           {songs.map((song, idx) => (
-            <div key={idx} className="bg-white/80 rounded-xl shadow-lg p-5 flex flex-col items-center backdrop-blur-md">
+            <div key={idx} className="bg-white/80 rounded-xl shadow-lg p-5 flex flex-col items-center backdrop-blur-md overflow-hidden">
               <div className="mb-1 text-lg font-semibold text-[#A033FF]">{song["곡 제목"]}</div>
               <div className="mb-3 text-gray-700">{song["아티스트"]}</div>
               {getYoutubeId(song["링크"]) && (
-                <iframe
-                  className="rounded-lg mb-2"
-                  width="560"
-                  height="315"
-                  src={`https://www.youtube.com/embed/${getYoutubeId(song["링크"])}?autoplay=0`}
-                  title="YouTube video player"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
+                <div className="w-full max-w-xl mx-auto aspect-[16/9] mb-2">
+                  <iframe
+                    className="w-full h-full rounded-lg"
+                    src={`https://www.youtube.com/embed/${getYoutubeId(song["링크"])}?autoplay=0`}
+                    title="YouTube video player"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
               )}
             </div>
           ))}

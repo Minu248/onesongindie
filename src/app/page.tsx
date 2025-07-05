@@ -57,19 +57,19 @@ export default function Home() {
         🎵
       </button>
       {song && (
-        <div className="w-full max-w-2xl bg-white/80 rounded-xl shadow-lg p-6 flex flex-col items-center backdrop-blur-md">
+        <div className="w-full max-w-2xl bg-white/80 rounded-xl shadow-lg p-6 flex flex-col items-center backdrop-blur-md overflow-hidden">
           <div className="mb-2 text-lg font-semibold text-[#A033FF]">{song["곡 제목"]}</div>
           <div className="mb-4 text-gray-700">{song["아티스트"]}</div>
           {getYoutubeId(song["링크"]) && (
-            <iframe
-              className="rounded-lg mb-4"
-              width="560"
-              height="315"
-              src={`https://www.youtube.com/embed/${getYoutubeId(song["링크"])}?autoplay=1`}
-              title="YouTube video player"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
+            <div className="w-full max-w-xl mx-auto aspect-[16/9] mb-4">
+              <iframe
+                className="w-full h-full rounded-lg"
+                src={`https://www.youtube.com/embed/${getYoutubeId(song["링크"])}?autoplay=1`}
+                title="YouTube video player"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
           )}
           <div className="mb-4 text-[#A033FF]">오늘의 추천곡이에요 🎧</div>
           <div className="flex gap-4 mb-2">
@@ -98,4 +98,4 @@ export default function Home() {
       )}
     </main>
   );
-} 
+}
