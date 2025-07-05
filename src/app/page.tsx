@@ -55,13 +55,20 @@ function HomeContent() {
       const random = songs[Math.floor(Math.random() * songs.length)];
       console.log("선택된 곡:", random);
       
-      setSong(random);
       setShowRandom(true);
+      setSong(random);
+      console.log("상태 업데이트 완료 - showRandom:", true, "song:", random);
     } catch (error) {
       console.error("fetchSong 에러:", error);
       setToast("곡을 불러오는 중 오류가 발생했습니다");
       setTimeout(() => setToast(""), 3000);
     }
+  };
+
+  const handleRecommendClick = () => {
+    console.log("추천 버튼 클릭됨");
+    setShowRandom(true);
+    fetchSong();
   };
 
   const likeSong = () => {
@@ -112,7 +119,7 @@ function HomeContent() {
           </div>
           <button
             className="w-48 h-14 bg-white/20 text-white rounded-full shadow-lg hover:bg-white/30 transition mb-8 flex items-center justify-center text-lg border-2 border-white/40 backdrop-blur font-semibold"
-            onClick={() => { setShowRandom(true); fetchSong(); }}
+            onClick={handleRecommendClick}
             aria-label="오늘의 인디 한 곡 추천받기"
           >
             오늘의 곡 추천 받기
@@ -124,7 +131,7 @@ function HomeContent() {
             <>
               <button
                 className="w-32 h-32 bg-white/20 text-white rounded-full shadow-lg hover:bg-white/30 transition mb-8 flex items-center justify-center text-4xl border-2 border-white/40 backdrop-blur"
-                onClick={fetchSong}
+                onClick={handleRecommendClick}
                 aria-label="오늘의 인디 한 곡 추천받기"
               >
                 🎵
@@ -137,7 +144,7 @@ function HomeContent() {
             <div className="flex flex-col items-center mb-4">
               <button
                 className="w-16 h-16 bg-white/20 text-white rounded-full shadow-lg hover:bg-white/30 transition mb-8 flex items-center justify-center text-2xl border-2 border-white/40 backdrop-blur"
-                onClick={fetchSong}
+                onClick={handleRecommendClick}
                 aria-label="오늘의 인디 한 곡 추천받기"
               >
                 🎵
