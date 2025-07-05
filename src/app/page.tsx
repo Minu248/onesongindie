@@ -2,6 +2,7 @@
 import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import Head from "next/head";
 
 const getYoutubeId = (url: string) => {
   const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)?)([\w-]{11})/);
@@ -34,6 +35,24 @@ function HomeContent() {
       };
       setSong(sharedSong);
       setIsSharedMode(true);
+      
+      // 동적으로 메타데이터 업데이트
+      document.title = `${title} - ${artist} | 들어볼래? 한 곡 Indie`;
+      const metaDescription = document.querySelector('meta[name="description"]');
+      if (metaDescription) {
+        metaDescription.setAttribute('content', `친구가 추천한 한국 인디 노래: ${title} - ${artist}`);
+      }
+      
+      // OpenGraph 메타데이터 업데이트
+      const ogTitle = document.querySelector('meta[property="og:title"]');
+      if (ogTitle) {
+        ogTitle.setAttribute('content', `${title} - ${artist}`);
+      }
+      
+      const ogDescription = document.querySelector('meta[property="og:description"]');
+      if (ogDescription) {
+        ogDescription.setAttribute('content', `친구가 추천한 한국 인디 노래: ${title} - ${artist}`);
+      }
     }
   }, [searchParams]);
 
