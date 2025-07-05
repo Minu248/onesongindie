@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import HomeContent from './HomeContent';
 import { Suspense } from 'react';
 
