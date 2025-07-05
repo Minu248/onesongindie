@@ -1,0 +1,15 @@
+{
+  "name": "한곡인디",
+  "short_name": "한곡인디",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#A033FF",
+  "theme_color": "#A033FF",
+  "icons": [
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+} 

@@ -17,7 +17,7 @@ export const metadata = {
   openGraph: {
     title: "들어볼래? 한 곡 Indie",
     description: "당신의 하루를 바꿔줄 오늘 한 곡",
-    url: "https://onesongindie.vercel.app",
+    url: "https://onesongindie.com",
     type: "website",
     images: [
       {
@@ -27,7 +27,11 @@ export const metadata = {
         alt: "들어볼래? 한 곡 Indie 오픈그래프 이미지"
       }
     ]
-  }
+  },
+  icons: {
+    icon: "/favicon.png"
+  },
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({ children }) {
