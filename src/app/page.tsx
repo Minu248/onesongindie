@@ -16,53 +16,44 @@ interface Song {
 
 function HomeContent() {
   const searchParams = useSearchParams();
-  const sharedSong = searchParams.get("title") && searchParams.get("artist") && searchParams.get("link")
-    ? {
-        "곡 제목": searchParams.get("title")!,
-        "아티스트": searchParams.get("artist")!,
-        "링크": searchParams.get("link")!,
-      }
-    : null;
-
   const [song, setSong] = useState<Song | null>(null);
   const [toast, setToast] = useState("");
-  const [showRandom, setShowRandom] = useState(!sharedSong);
+  const [isSharedMode, setIsSharedMode] = useState(false);
 
+  // URL 파라미터에서 공유된 곡 정보 확인
   useEffect(() => {
-    if (sharedSong) {
+    const title = searchParams.get("title");
+    const artist = searchParams.get("artist");
+    const link = searchParams.get("link");
+    
+    if (title && artist && link) {
+      const sharedSong = {
+        "곡 제목": title,
+        "아티스트": artist,
+        "링크": link,
+      };
       setSong(sharedSong);
-      setShowRandom(false);
+      setIsSharedMode(true);
     }
-  }, [sharedSong]);
-
-  // 디버깅을 위한 상태 로깅
-  useEffect(() => {
-    console.log("상태 변경됨 - showRandom:", showRandom, "song:", song);
-  }, [showRandom, song]);
+  }, [searchParams]);
 
   const fetchSong = async () => {
     try {
-      console.log("fetchSong 함수 호출됨");
       const res = await fetch("https://api.sheetbest.com/sheets/88c2b9c7-8d30-462b-ae7c-a4859aaf6955");
-      console.log("API 응답:", res.status);
       
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
       
       const songs: Song[] = await res.json();
-      console.log("받아온 곡 개수:", songs.length);
       
       if (songs.length === 0) {
         throw new Error("곡 데이터가 없습니다");
       }
       
       const random = songs[Math.floor(Math.random() * songs.length)];
-      console.log("선택된 곡:", random);
-      
-      setShowRandom(true);
       setSong(random);
-      console.log("상태 업데이트 완료 - showRandom:", true, "song:", random);
+      setIsSharedMode(false);
     } catch (error) {
       console.error("fetchSong 에러:", error);
       setToast("곡을 불러오는 중 오류가 발생했습니다");
@@ -71,8 +62,6 @@ function HomeContent() {
   };
 
   const handleRecommendClick = () => {
-    console.log("추천 버튼 클릭됨");
-    setShowRandom(true);
     fetchSong();
   };
 
@@ -95,7 +84,6 @@ function HomeContent() {
     setTimeout(() => setToast(""), 1500);
   };
 
-  // 홈 화면 렌더링
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#FF2A68] via-[#A033FF] to-[#0B63F6] px-4">
       <div className="text-center mb-8">
@@ -103,8 +91,8 @@ function HomeContent() {
         <div className="text-5xl font-bold text-white drop-shadow">한 곡 Indie</div>
       </div>
       
-      {/* 공유된 곡이 있고 아직 랜덤 모드가 아닐 때 */}
-      {sharedSong && !showRandom && song ? (
+      {/* 공유 모드일 때 */}
+      {isSharedMode && song ? (
         <div className="flex flex-col items-center mb-4 w-full">
           <div className="w-full max-w-2xl bg-white/80 rounded-xl shadow-lg p-6 flex flex-col items-center backdrop-blur-md overflow-hidden mb-6">
             <div className="mb-2 text-lg font-semibold text-[#A033FF]">{song["곡 제목"]}</div>
