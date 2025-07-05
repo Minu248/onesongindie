@@ -1,4 +1,5 @@
 import HomeContent from './HomeContent';
+import { Suspense } from 'react';
 
 export async function generateMetadata({ searchParams }) {
   const title = searchParams?.title;
@@ -62,5 +63,9 @@ export async function generateMetadata({ searchParams }) {
 }
 
 export default function Page() {
-  return <HomeContent />;
+  return (
+    <Suspense fallback={<div />}>
+      <HomeContent />
+    </Suspense>
+  );
 }
