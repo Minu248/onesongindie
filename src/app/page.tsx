@@ -49,16 +49,33 @@ export default function Home() {
         <div className="text-lg text-white/80 mb-2">들어볼래?</div>
         <div className="text-5xl font-bold text-white drop-shadow">한 곡 Indie</div>
       </div>
-      <button
-        className="w-32 h-32 bg-white/20 text-white rounded-full shadow-lg hover:bg-white/30 transition mb-8 flex items-center justify-center text-4xl border-2 border-white/40 backdrop-blur"
-        onClick={fetchSong}
-        aria-label="오늘의 인디 한 곡 추천받기"
-      >
-        🎵
-      </button>
-      <div className="mb-8 text-white/90 text-base text-center font-medium">
-        당신의 하루를 바꿔 줄 한국 인디 음악을 발견하세요
-      </div>
+      {!song ? (
+        <>
+          <button
+            className="w-32 h-32 bg-white/20 text-white rounded-full shadow-lg hover:bg-white/30 transition mb-8 flex items-center justify-center text-4xl border-2 border-white/40 backdrop-blur"
+            onClick={fetchSong}
+            aria-label="오늘의 인디 한 곡 추천받기"
+          >
+            🎵
+          </button>
+          <div className="mb-8 text-white/90 text-base text-center font-medium">
+            당신의 하루를 바꿔줄 한국 인디 음악을 발견하세요
+          </div>
+        </>
+      ) : (
+        <div className="flex flex-col items-center mb-4">
+          <button
+            className="w-16 h-16 bg-white/20 text-white rounded-full shadow-lg hover:bg-white/30 transition mb-4 flex items-center justify-center text-2xl border-2 border-white/40 backdrop-blur"
+            onClick={fetchSong}
+            aria-label="오늘의 인디 한 곡 추천받기"
+          >
+            🎵
+          </button>
+          <div className="mb-4 text-white/90 text-base text-center font-medium">
+            당신의 하루를 바꿔줄 한국 인디 음악을 발견하세요
+          </div>
+        </div>
+      )}
       {song && (
         <div className="w-full max-w-2xl bg-white/80 rounded-xl shadow-lg p-6 flex flex-col items-center backdrop-blur-md overflow-hidden">
           <div className="mb-2 text-lg font-semibold text-[#A033FF]">{song["곡 제목"]}</div>
