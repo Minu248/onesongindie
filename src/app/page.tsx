@@ -85,9 +85,12 @@ function HomeContent() {
                 />
               </div>
             )}
+            <div className="text-center text-[#A033FF] font-medium mb-4">
+              ✉️ 친구가 추천한 한국 인디 노래가 도착했어요
+            </div>
           </div>
           <button
-            className="w-32 h-12 bg-white/20 text-white rounded-full shadow-lg hover:bg-white/30 transition mb-8 flex items-center justify-center text-lg border-2 border-white/40 backdrop-blur font-semibold"
+            className="w-48 h-14 bg-white/20 text-white rounded-full shadow-lg hover:bg-white/30 transition mb-8 flex items-center justify-center text-lg border-2 border-white/40 backdrop-blur font-semibold"
             onClick={() => { setShowRandom(true); fetchSong(); }}
             aria-label="오늘의 인디 한 곡 추천받기"
           >
