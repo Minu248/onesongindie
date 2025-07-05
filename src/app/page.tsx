@@ -88,7 +88,25 @@ export default function Home() {
               🔗
             </button>
           </div>
-          <Link href="/playlist" className="text-[#A033FF] underline mt-2">내 플레이리스트 보기</Link>
+          <Link
+            href="/playlist"
+            className="text-[#A033FF] underline mt-2"
+          >
+            내 플레이리스트 보기
+          </Link>
+          <a
+            href="https://forms.gle/zQTC3ab4sgzJEPEY6"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 w-full flex justify-center"
+          >
+            <button
+              className="bg-[#A033FF] text-white rounded-full px-6 py-3 shadow-md hover:bg-[#7c25c9] transition text-base font-semibold"
+              type="button"
+            >
+              나만 알고 있는 인디 노래를 추천해주세요
+            </button>
+          </a>
         </div>
       )}
       {toast && (
