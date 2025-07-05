@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Metadata } from "next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -11,9 +12,13 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export async function generateMetadata({ searchParams }) {
-  const title = searchParams?.title;
-  const artist = searchParams?.artist;
+export async function generateMetadata({ 
+  searchParams 
+}: { 
+  searchParams: { [key: string]: string | string[] | undefined } 
+}): Promise<Metadata> {
+  const title = searchParams?.title as string;
+  const artist = searchParams?.artist as string;
   
   if (title && artist) {
     return {
@@ -76,7 +81,7 @@ export async function generateMetadata({ searchParams }) {
   };
 }
 
-export default function RootLayout({ children }) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body
@@ -86,4 +91,4 @@ export default function RootLayout({ children }) {
       </body>
     </html>
   );
-}
+} 
