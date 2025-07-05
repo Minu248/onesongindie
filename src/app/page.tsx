@@ -35,6 +35,11 @@ function HomeContent() {
     }
   }, [sharedSong]);
 
+  // 디버깅을 위한 상태 로깅
+  useEffect(() => {
+    console.log("상태 변경됨 - showRandom:", showRandom, "song:", song);
+  }, [showRandom, song]);
+
   const fetchSong = async () => {
     try {
       console.log("fetchSong 함수 호출됨");
@@ -97,7 +102,9 @@ function HomeContent() {
         <div className="text-lg text-white/80 mb-2">들어볼래?</div>
         <div className="text-5xl font-bold text-white drop-shadow">한 곡 Indie</div>
       </div>
-      {(!showRandom && sharedSong && song) ? (
+      
+      {/* 공유된 곡이 있고 아직 랜덤 모드가 아닐 때 */}
+      {sharedSong && !showRandom && song ? (
         <div className="flex flex-col items-center mb-4 w-full">
           <div className="w-full max-w-2xl bg-white/80 rounded-xl shadow-lg p-6 flex flex-col items-center backdrop-blur-md overflow-hidden mb-6">
             <div className="mb-2 text-lg font-semibold text-[#A033FF]">{song["곡 제목"]}</div>
@@ -127,6 +134,7 @@ function HomeContent() {
         </div>
       ) : (
         <>
+          {/* 곡이 없을 때 (초기 상태) */}
           {!song ? (
             <>
               <button
@@ -141,6 +149,7 @@ function HomeContent() {
               </div>
             </>
           ) : (
+            /* 곡이 있을 때 (랜덤 추천 모드) */
             <div className="flex flex-col items-center mb-4">
               <button
                 className="w-16 h-16 bg-white/20 text-white rounded-full shadow-lg hover:bg-white/30 transition mb-8 flex items-center justify-center text-2xl border-2 border-white/40 backdrop-blur"
@@ -154,6 +163,8 @@ function HomeContent() {
               </div>
             </div>
           )}
+          
+          {/* 곡 정보 표시 */}
           {song && (
             <div className="w-full max-w-2xl bg-white/80 rounded-xl shadow-lg p-6 flex flex-col items-center backdrop-blur-md overflow-hidden">
               <div className="mb-2 text-lg font-semibold text-[#A033FF]">{song["곡 제목"]}</div>
