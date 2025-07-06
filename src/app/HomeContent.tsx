@@ -2,6 +2,8 @@
 import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { signIn } from "next-auth/react";
+
 
 const getYoutubeId = (url: string) => {
   const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)?)([\w-]{11})/);
@@ -140,6 +142,7 @@ export default function HomeContent() {
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#FF2A68] via-[#A033FF] to-[#0B63F6] px-4">
+
       <div className="text-center mb-8">
         <div className="text-lg text-white/80 mb-2">들어볼래?</div>
         <div className="text-5xl font-bold text-white drop-shadow">한 곡 Indie</div>
@@ -246,6 +249,13 @@ export default function HomeContent() {
               >
                 내 플레이리스트 보기
               </Link>
+              <button
+                className="mt-6 w-full bg-yellow-400 hover:bg-yellow-500 text-black rounded-full px-6 py-3 shadow-md transition text-base font-semibold flex items-center justify-center"
+                type="button"
+                onClick={() => signIn('kakao')}
+              >
+                로그인하고 노래 무제한으로 추천 받기
+              </button>
               <a
                 href="https://forms.gle/zQTC3ab4sgzJEPEY6"
                 target="_blank"
