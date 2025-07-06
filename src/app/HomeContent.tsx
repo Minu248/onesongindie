@@ -112,7 +112,7 @@ export default function HomeContent() {
 
   const handleRecommendClick = () => {
     if (!canRecommend) {
-      setToast("오늘은 이미 추천을 받았어요! 내일 다시 와주세요 😊");
+      setToast("오늘의 추천은 이미 받았어요! 내일 다시 와주세요 😊");
       setTimeout(() => setToast(""), 3000);
       return;
     }
@@ -189,10 +189,7 @@ export default function HomeContent() {
                 {canRecommend ? '🎵' : '⏰'}
               </button>
               <div className="mb-8 text-white/90 text-base text-center font-medium">
-                {canRecommend 
-                  ? "당신의 하루를 바꿔줄 한국 인디 음악을 발견하세요"
-                  : "오늘의 추천은 이미 받았어요! 내일 다시 와주세요 😊"
-                }
+                당신의 하루를 바꿔줄 한국 인디 음악을 발견하세요
               </div>
             </>
           ) : (
@@ -207,10 +204,7 @@ export default function HomeContent() {
                 {canRecommend ? '🎵' : '⏰'}
               </button>
               <div className="mb-8 text-white/90 text-base text-center font-medium">
-                {canRecommend 
-                  ? "당신의 하루를 바꿔줄 한국 인디 음악을 발견하세요"
-                  : "오늘의 추천은 이미 받았어요! 내일 다시 와주세요 😊"
-                }
+                당신의 하루를 바꿔줄 한국 인디 음악을 발견하세요
               </div>
             </div>
           )}
