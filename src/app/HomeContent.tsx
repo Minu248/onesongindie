@@ -214,7 +214,7 @@ export default function HomeContent() {
     <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#FF2A68] via-[#A033FF] to-[#0B63F6] px-4">
 
       <div className="text-center mb-8">
-        <div className="text-lg text-white/80 mb-2">들어볼래?</div>
+        <div className="text-lg text-white/90 mb-2">들어볼래?</div>
         <div className="text-5xl font-bold text-white drop-shadow">한 곡 Indie</div>
       </div>
       
@@ -261,14 +261,14 @@ export default function HomeContent() {
                 {canRecommend ? '🎵' : '⏰'}
               </button>
               {/* 카운트 숫자 + LP판 아이콘 */}
-              <div className="flex items-center justify-center mb-2">
+              <div className="flex items-center justify-center mb-4">
                 {!session && <LpIcon />}
                 {!session && <span className="text-2xl font-bold text-white">{recommendCount}/{MAX_RECOMMENDATION_PER_DAY}</span>}
               </div>
               <div className="mb-2 text-white/90 text-base text-center font-medium">
                 당신의 하루를 바꿔줄 한국 인디 음악을 발견하세요
               </div>
-              <div className="mb-8 text-white/80 text-base text-center font-medium">
+              <div className="mb-4 text-white/90 text-base text-center font-medium">
                 하루에 10곡의 음악을 추천 받을 수 있어요
               </div>
             </>
@@ -283,14 +283,14 @@ export default function HomeContent() {
                 {canRecommend ? '🎵' : '⏰'}
               </button>
               {/* 카운트 숫자 + LP판 아이콘 */}
-              <div className="flex items-center justify-center mb-2">
+              <div className="flex items-center justify-center mb-4">
                 {!session && <LpIcon />}
                 {!session && <span className="text-2xl font-bold text-white">{recommendCount}/{MAX_RECOMMENDATION_PER_DAY}</span>}
               </div>
               <div className="mb-2 text-white/90 text-base text-center font-medium">
                 당신의 하루를 바꿔줄 한국 인디 음악을 발견하세요
               </div>
-              <div className="mb-8 text-white/80 text-base text-center font-medium">
+              <div className="mb-4 text-white/90 text-base text-center font-medium">
                 하루에 10곡의 음악을 추천 받을 수 있어요
               </div>
             </div>
