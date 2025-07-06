@@ -256,6 +256,7 @@ export default function HomeContent() {
                 내 플레이리스트 보기
               </Link>
               <div className="w-full flex flex-col gap-4 mt-6">
+                {/*
                 <button
                   className="w-full bg-yellow-400 hover:bg-yellow-500 text-black rounded-full px-6 py-3 shadow-md transition text-base font-semibold"
                   type="button"
@@ -263,6 +264,7 @@ export default function HomeContent() {
                 >
                   로그인하고 노래 무제한으로 추천 받기
                 </button>
+                */}
                 <a
                   href="https://forms.gle/zQTC3ab4sgzJEPEY6"
                   target="_blank"
