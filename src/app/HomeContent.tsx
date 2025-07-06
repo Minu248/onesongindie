@@ -257,7 +257,7 @@ export default function HomeContent() {
               </Link>
               <div className="w-full flex flex-col gap-4 mt-6">
                 <button
-                  className="bg-[#A033FF] text-white rounded-full px-6 py-3 shadow-md hover:bg-[#7c25c9] transition text-base font-semibold"
+                  className="w-full bg-yellow-400 hover:bg-yellow-500 text-black rounded-full px-6 py-3 shadow-md transition text-base font-semibold"
                   type="button"
                   onClick={() => signIn('kakao')}
                 >
@@ -270,7 +270,7 @@ export default function HomeContent() {
                   className="w-full flex justify-center"
                 >
                   <button
-                    className="bg-[#A033FF] text-white rounded-full px-6 py-3 shadow-md hover:bg-[#7c25c9] transition text-base font-semibold"
+                    className="w-full bg-[#A033FF] text-white rounded-full px-6 py-3 shadow-md hover:bg-[#7c25c9] transition text-base font-semibold"
                     type="button"
                   >
                     나만 알고 있는 인디 노래를 추천해주세요
