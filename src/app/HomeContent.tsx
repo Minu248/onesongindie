@@ -181,10 +181,9 @@ export default function HomeContent() {
           {!song ? (
             <>
               <button
-                className={`w-32 h-32 ${canRecommend ? 'bg-white/20 hover:bg-white/30' : 'bg-gray-400/20 cursor-not-allowed'} text-white rounded-full shadow-lg transition mb-8 flex items-center justify-center text-4xl border-2 border-white/40 backdrop-blur`}
+                className={`w-32 h-32 ${canRecommend ? 'bg-white/20 hover:bg-white/30' : 'bg-gray-400/20 hover:bg-gray-400/30'} text-white rounded-full shadow-lg transition mb-8 flex items-center justify-center text-4xl border-2 border-white/40 backdrop-blur`}
                 onClick={handleRecommendClick}
                 aria-label="오늘의 인디 한 곡 추천받기"
-                disabled={!canRecommend}
               >
                 {canRecommend ? '🎵' : '⏰'}
               </button>
@@ -196,10 +195,9 @@ export default function HomeContent() {
             /* 곡이 있을 때 (랜덤 추천 모드) */
             <div className="flex flex-col items-center mb-4">
               <button
-                className={`w-16 h-16 ${canRecommend ? 'bg-white/20 hover:bg-white/30' : 'bg-gray-400/20 cursor-not-allowed'} text-white rounded-full shadow-lg transition mb-8 flex items-center justify-center text-2xl border-2 border-white/40 backdrop-blur`}
+                className={`w-16 h-16 ${canRecommend ? 'bg-white/20 hover:bg-white/30' : 'bg-gray-400/20 hover:bg-gray-400/30'} text-white rounded-full shadow-lg transition mb-8 flex items-center justify-center text-2xl border-2 border-white/40 backdrop-blur`}
                 onClick={handleRecommendClick}
                 aria-label="오늘의 인디 한 곡 추천받기"
-                disabled={!canRecommend}
               >
                 {canRecommend ? '🎵' : '⏰'}
               </button>
