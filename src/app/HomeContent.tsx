@@ -5,6 +5,15 @@ import { useSearchParams } from "next/navigation";
 import { signIn, signOut } from "next-auth/react";
 import { useSession } from "next-auth/react";
 
+const LpIcon = () => (
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="mr-2">
+    <circle cx="16" cy="16" r="15" fill="#111" stroke="#222" strokeWidth="2" />
+    <circle cx="16" cy="16" r="7" fill="#F55" />
+    <circle cx="16" cy="16" r="2" fill="#FDD" />
+    <path d="M8 8a12 12 0 0 1 16 0" stroke="#333" strokeWidth="2" />
+    <path d="M8 24a12 12 0 0 0 16 0" stroke="#333" strokeWidth="2" />
+  </svg>
+);
 
 const getYoutubeId = (url: string) => {
   const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)?)([\w-]{11})/);
@@ -251,14 +260,16 @@ export default function HomeContent() {
               >
                 {canRecommend ? '🎵' : '⏰'}
               </button>
+              {/* 카운트 숫자 + LP판 아이콘 */}
+              <div className="flex items-center justify-center mb-2">
+                {!session && <LpIcon />}
+                {!session && <span className="text-2xl font-bold text-white">{recommendCount}/{MAX_RECOMMENDATION_PER_DAY}</span>}
+              </div>
               <div className="mb-2 text-white/90 text-base text-center font-medium">
                 당신의 하루를 바꿔줄 한국 인디 음악을 발견하세요
               </div>
               <div className="mb-8 text-white/80 text-base text-center font-medium">
                 하루에 10곡의 음악을 추천 받을 수 있어요
-              </div>
-              <div className="mb-4 text-white/80 text-sm text-center font-medium">
-                {!session && `${recommendCount + 1}/${MAX_RECOMMENDATION_PER_DAY}`}
               </div>
             </>
           ) : (
@@ -271,14 +282,16 @@ export default function HomeContent() {
               >
                 {canRecommend ? '🎵' : '⏰'}
               </button>
+              {/* 카운트 숫자 + LP판 아이콘 */}
+              <div className="flex items-center justify-center mb-2">
+                {!session && <LpIcon />}
+                {!session && <span className="text-2xl font-bold text-white">{recommendCount}/{MAX_RECOMMENDATION_PER_DAY}</span>}
+              </div>
               <div className="mb-2 text-white/90 text-base text-center font-medium">
                 당신의 하루를 바꿔줄 한국 인디 음악을 발견하세요
               </div>
               <div className="mb-8 text-white/80 text-base text-center font-medium">
                 하루에 10곡의 음악을 추천 받을 수 있어요
-              </div>
-              <div className="mb-4 text-white/80 text-sm text-center font-medium">
-                {!session && `${recommendCount + 1}/${MAX_RECOMMENDATION_PER_DAY}`}
               </div>
             </div>
           )}
