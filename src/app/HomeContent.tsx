@@ -17,9 +17,27 @@ interface Song {
   "링크": string;
 }
 
-// 하루에 한 번 제한을 위한 유틸리티 함수들
+// 하루에 최대 추천 횟수
+const MAX_RECOMMENDATION_PER_DAY = 10;
+
 const getTodayString = () => {
   return new Date().toDateString();
+};
+
+const getRecommendationCount = () => {
+  const lastDate = localStorage.getItem("lastRecommendationDate");
+  const today = getTodayString();
+  if (lastDate !== today) {
+    localStorage.setItem("lastRecommendationDate", today);
+    localStorage.setItem("recommendationCount", "0");
+    return 0;
+  }
+  return parseInt(localStorage.getItem("recommendationCount") || "0", 10);
+};
+
+const incrementRecommendationCount = () => {
+  const count = getRecommendationCount() + 1;
+  localStorage.setItem("recommendationCount", count.toString());
 };
 
 const canGetRecommendation = () => {
@@ -65,11 +83,12 @@ export default function HomeContent() {
       setCanRecommend(true); // 로그인 유저는 무제한
     } else {
       const todaySong = getStoredTodaySong();
+      const count = getRecommendationCount();
       if (todaySong) {
         setSong(todaySong);
-        setCanRecommend(false);
+        setCanRecommend(count < MAX_RECOMMENDATION_PER_DAY);
       } else {
-        setCanRecommend(canGetRecommendation());
+        setCanRecommend(count < MAX_RECOMMENDATION_PER_DAY);
       }
     }
   }, [session]);
@@ -108,8 +127,8 @@ export default function HomeContent() {
       const random = songs[Math.floor(Math.random() * songs.length)];
       setSong(random);
       setStoredTodaySong(random);
-      setRecommendationUsed();
-      setCanRecommend(false);
+      if (!session) incrementRecommendationCount();
+      setCanRecommend(session ? true : getRecommendationCount() < MAX_RECOMMENDATION_PER_DAY);
       setIsSharedMode(false);
     } catch (error) {
       console.error("fetchSong 에러:", error);
@@ -120,7 +139,7 @@ export default function HomeContent() {
 
   const handleRecommendClick = () => {
     if (!session && !canRecommend) {
-      setToast("오늘의 추천은 이미 받았어요! 내일 다시 와주세요 😊");
+      setToast(`오늘은 최대 ${MAX_RECOMMENDATION_PER_DAY}번까지 추천받을 수 있어요! 내일 다시 와주세요 😊`);
       setTimeout(() => setToast(""), 3000);
       return;
     }
