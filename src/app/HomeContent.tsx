@@ -265,14 +265,20 @@ export default function HomeContent() {
             /* 곡이 있을 때 (랜덤 추천 모드) */
             <div className="flex flex-col items-center mb-4">
               <button
-                className={`w-16 h-16 ${canRecommend ? 'bg-white/20 hover:bg-white/30' : 'bg-gray-400/20 hover:bg-gray-400/30'} text-white rounded-full shadow-lg transition mb-8 flex items-center justify-center text-2xl border-2 border-white/40 backdrop-blur`}
+                className={`w-16 h-16 ${canRecommend ? 'bg-white/20 hover:bg-white/30' : 'bg-gray-400/20 hover:bg-gray-400/30'} text-white rounded-full shadow-lg transition mb-4 flex items-center justify-center text-2xl border-2 border-white/40 backdrop-blur`}
                 onClick={handleRecommendClick}
                 aria-label="오늘의 인디 한 곡 추천받기"
               >
                 {canRecommend ? '🎵' : '⏰'}
               </button>
-              <div className="mb-8 text-white/90 text-base text-center font-medium">
+              <div className="mb-2 text-white/90 text-base text-center font-medium">
                 당신의 하루를 바꿔줄 한국 인디 음악을 발견하세요
+              </div>
+              <div className="mb-8 text-white/80 text-base text-center font-medium">
+                하루에 10곡의 음악을 추천 받을 수 있어요
+              </div>
+              <div className="mb-4 text-white/80 text-sm text-center font-medium">
+                {!session && `${recommendCount + 1}/${MAX_RECOMMENDATION_PER_DAY}`}
               </div>
             </div>
           )}
