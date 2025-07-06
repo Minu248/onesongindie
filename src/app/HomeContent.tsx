@@ -3,6 +3,7 @@ import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
+import { useSession } from "next-auth/react";
 
 
 const getYoutubeId = (url: string) => {
@@ -52,6 +53,7 @@ const setStoredTodaySong = (song: Song) => {
 
 export default function HomeContent() {
   const searchParams = useSearchParams();
+  const { data: session } = useSession();
   const [song, setSong] = useState<Song | null>(null);
   const [toast, setToast] = useState("");
   const [isSharedMode, setIsSharedMode] = useState(false);
@@ -59,14 +61,18 @@ export default function HomeContent() {
 
   // 컴포넌트 마운트 시 오늘의 곡이 이미 있는지 확인
   useEffect(() => {
-    const todaySong = getStoredTodaySong();
-    if (todaySong) {
-      setSong(todaySong);
-      setCanRecommend(false);
+    if (session) {
+      setCanRecommend(true); // 로그인 유저는 무제한
     } else {
-      setCanRecommend(canGetRecommendation());
+      const todaySong = getStoredTodaySong();
+      if (todaySong) {
+        setSong(todaySong);
+        setCanRecommend(false);
+      } else {
+        setCanRecommend(canGetRecommendation());
+      }
     }
-  }, []);
+  }, [session]);
 
   // URL 파라미터에서 공유된 곡 정보 확인
   useEffect(() => {
@@ -113,7 +119,7 @@ export default function HomeContent() {
   };
 
   const handleRecommendClick = () => {
-    if (!canRecommend) {
+    if (!session && !canRecommend) {
       setToast("오늘의 추천은 이미 받았어요! 내일 다시 와주세요 😊");
       setTimeout(() => setToast(""), 3000);
       return;
@@ -249,26 +255,28 @@ export default function HomeContent() {
               >
                 내 플레이리스트 보기
               </Link>
-              <button
-                className="mt-6 w-full bg-yellow-400 hover:bg-yellow-500 text-black rounded-full px-6 py-3 shadow-md transition text-base font-semibold flex items-center justify-center"
-                type="button"
-                onClick={() => signIn('kakao')}
-              >
-                로그인하고 노래 무제한으로 추천 받기
-              </button>
-              <a
-                href="https://forms.gle/zQTC3ab4sgzJEPEY6"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-4 w-full flex justify-center"
-              >
+              <div className="w-full flex flex-col gap-4 mt-6">
                 <button
                   className="bg-[#A033FF] text-white rounded-full px-6 py-3 shadow-md hover:bg-[#7c25c9] transition text-base font-semibold"
                   type="button"
+                  onClick={() => signIn('kakao')}
                 >
-                  나만 알고 있는 인디 노래를 추천해주세요
+                  로그인하고 노래 무제한으로 추천 받기
                 </button>
-              </a>
+                <a
+                  href="https://forms.gle/zQTC3ab4sgzJEPEY6"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full flex justify-center"
+                >
+                  <button
+                    className="bg-[#A033FF] text-white rounded-full px-6 py-3 shadow-md hover:bg-[#7c25c9] transition text-base font-semibold"
+                    type="button"
+                  >
+                    나만 알고 있는 인디 노래를 추천해주세요
+                  </button>
+                </a>
+              </div>
             </div>
           )}
         </>
