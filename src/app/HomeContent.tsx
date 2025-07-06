@@ -14,11 +14,57 @@ interface Song {
   "링크": string;
 }
 
+// 하루에 한 번 제한을 위한 유틸리티 함수들
+const getTodayString = () => {
+  return new Date().toDateString();
+};
+
+const canGetRecommendation = () => {
+  const lastRecommendationDate = localStorage.getItem("lastRecommendationDate");
+  const today = getTodayString();
+  
+  if (!lastRecommendationDate || lastRecommendationDate !== today) {
+    return true;
+  }
+  return false;
+};
+
+const setRecommendationUsed = () => {
+  localStorage.setItem("lastRecommendationDate", getTodayString());
+};
+
+const getStoredTodaySong = (): Song | null => {
+  const storedDate = localStorage.getItem("lastRecommendationDate");
+  const today = getTodayString();
+  
+  if (storedDate === today) {
+    const storedSong = localStorage.getItem("todaySong");
+    return storedSong ? JSON.parse(storedSong) : null;
+  }
+  return null;
+};
+
+const setStoredTodaySong = (song: Song) => {
+  localStorage.setItem("todaySong", JSON.stringify(song));
+};
+
 export default function HomeContent() {
   const searchParams = useSearchParams();
   const [song, setSong] = useState<Song | null>(null);
   const [toast, setToast] = useState("");
   const [isSharedMode, setIsSharedMode] = useState(false);
+  const [canRecommend, setCanRecommend] = useState(true);
+
+  // 컴포넌트 마운트 시 오늘의 곡이 이미 있는지 확인
+  useEffect(() => {
+    const todaySong = getStoredTodaySong();
+    if (todaySong) {
+      setSong(todaySong);
+      setCanRecommend(false);
+    } else {
+      setCanRecommend(canGetRecommendation());
+    }
+  }, []);
 
   // URL 파라미터에서 공유된 곡 정보 확인
   useEffect(() => {
@@ -53,6 +99,9 @@ export default function HomeContent() {
       
       const random = songs[Math.floor(Math.random() * songs.length)];
       setSong(random);
+      setStoredTodaySong(random);
+      setRecommendationUsed();
+      setCanRecommend(false);
       setIsSharedMode(false);
     } catch (error) {
       console.error("fetchSong 에러:", error);
@@ -62,6 +111,11 @@ export default function HomeContent() {
   };
 
   const handleRecommendClick = () => {
+    if (!canRecommend) {
+      setToast("오늘은 이미 추천을 받았어요! 내일 다시 와주세요 😊");
+      setTimeout(() => setToast(""), 3000);
+      return;
+    }
     fetchSong();
   };
 
@@ -113,11 +167,12 @@ export default function HomeContent() {
             </div>
           </div>
           <button
-            className="w-48 h-14 bg-white/20 text-white rounded-full shadow-lg hover:bg-white/30 transition mb-8 flex items-center justify-center text-lg border-2 border-white/40 backdrop-blur font-semibold"
+            className={`w-48 h-14 ${canRecommend ? 'bg-white/20 hover:bg-white/30' : 'bg-gray-400/20 cursor-not-allowed'} text-white rounded-full shadow-lg transition mb-8 flex items-center justify-center text-lg border-2 border-white/40 backdrop-blur font-semibold`}
             onClick={handleRecommendClick}
             aria-label="오늘의 인디 한 곡 추천받기"
+            disabled={!canRecommend}
           >
-            오늘의 곡 추천 받기
+            {canRecommend ? '오늘의 곡 추천 받기' : '오늘은 이미 받았어요'}
           </button>
         </div>
       ) : (
@@ -126,28 +181,36 @@ export default function HomeContent() {
           {!song ? (
             <>
               <button
-                className="w-32 h-32 bg-white/20 text-white rounded-full shadow-lg hover:bg-white/30 transition mb-8 flex items-center justify-center text-4xl border-2 border-white/40 backdrop-blur"
+                className={`w-32 h-32 ${canRecommend ? 'bg-white/20 hover:bg-white/30' : 'bg-gray-400/20 cursor-not-allowed'} text-white rounded-full shadow-lg transition mb-8 flex items-center justify-center text-4xl border-2 border-white/40 backdrop-blur`}
                 onClick={handleRecommendClick}
                 aria-label="오늘의 인디 한 곡 추천받기"
+                disabled={!canRecommend}
               >
-                🎵
+                {canRecommend ? '🎵' : '⏰'}
               </button>
               <div className="mb-8 text-white/90 text-base text-center font-medium">
-                당신의 하루를 바꿔줄 한국 인디 음악을 발견하세요
+                {canRecommend 
+                  ? "당신의 하루를 바꿔줄 한국 인디 음악을 발견하세요"
+                  : "오늘의 추천은 이미 받았어요! 내일 다시 와주세요 😊"
+                }
               </div>
             </>
           ) : (
             /* 곡이 있을 때 (랜덤 추천 모드) */
             <div className="flex flex-col items-center mb-4">
               <button
-                className="w-16 h-16 bg-white/20 text-white rounded-full shadow-lg hover:bg-white/30 transition mb-8 flex items-center justify-center text-2xl border-2 border-white/40 backdrop-blur"
+                className={`w-16 h-16 ${canRecommend ? 'bg-white/20 hover:bg-white/30' : 'bg-gray-400/20 cursor-not-allowed'} text-white rounded-full shadow-lg transition mb-8 flex items-center justify-center text-2xl border-2 border-white/40 backdrop-blur`}
                 onClick={handleRecommendClick}
                 aria-label="오늘의 인디 한 곡 추천받기"
+                disabled={!canRecommend}
               >
-                🎵
+                {canRecommend ? '🎵' : '⏰'}
               </button>
               <div className="mb-8 text-white/90 text-base text-center font-medium">
-                당신의 하루를 바꿔줄 한국 인디 음악을 발견하세요
+                {canRecommend 
+                  ? "당신의 하루를 바꿔줄 한국 인디 음악을 발견하세요"
+                  : "오늘의 추천은 이미 받았어요! 내일 다시 와주세요 😊"
+                }
               </div>
             </div>
           )}
