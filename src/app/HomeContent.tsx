@@ -69,6 +69,24 @@ const setStoredTodaySong = (song: Song) => {
   localStorage.setItem("todaySong", JSON.stringify(song));
 };
 
+// 오늘 추천받은 곡 리스트 관리
+const getTodayRecommendedSongs = (): string[] => {
+  const lastDate = localStorage.getItem("lastRecommendationDate");
+  const today = getTodayString();
+  if (lastDate !== today) {
+    localStorage.setItem("lastRecommendationDate", today);
+    localStorage.setItem("todayRecommendedSongs", JSON.stringify([]));
+    return [];
+  }
+  return JSON.parse(localStorage.getItem("todayRecommendedSongs") || "[]");
+};
+
+const addTodayRecommendedSong = (song: Song) => {
+  const list = getTodayRecommendedSongs();
+  list.push(song["링크"]);
+  localStorage.setItem("todayRecommendedSongs", JSON.stringify(list));
+};
+
 export default function HomeContent() {
   const searchParams = useSearchParams();
   const { data: session } = useSession();
@@ -76,14 +94,17 @@ export default function HomeContent() {
   const [toast, setToast] = useState("");
   const [isSharedMode, setIsSharedMode] = useState(false);
   const [canRecommend, setCanRecommend] = useState(true);
+  const [recommendCount, setRecommendCount] = useState(0);
 
   // 컴포넌트 마운트 시 오늘의 곡이 이미 있는지 확인
   useEffect(() => {
     if (session) {
-      setCanRecommend(true); // 로그인 유저는 무제한
+      setCanRecommend(true);
+      setRecommendCount(0); // 로그인 유저는 무제한이므로 카운트 표시 X
     } else {
       const todaySong = getStoredTodaySong();
       const count = getRecommendationCount();
+      setRecommendCount(count);
       if (todaySong) {
         setSong(todaySong);
         setCanRecommend(count < MAX_RECOMMENDATION_PER_DAY);
@@ -118,16 +139,31 @@ export default function HomeContent() {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
       
-      const songs: Song[] = await res.json();
+      let songs: Song[] = await res.json();
       
       if (songs.length === 0) {
         throw new Error("곡 데이터가 없습니다");
       }
       
+      // 오늘 추천받은 곡 제외
+      if (!session) {
+        const recommendedLinks = getTodayRecommendedSongs();
+        songs = songs.filter(song => !recommendedLinks.includes(song["링크"]));
+        if (songs.length === 0) {
+          setToast("더 이상 추천할 곡이 없습니다!");
+          setTimeout(() => setToast(""), 3000);
+          return;
+        }
+      }
+      
       const random = songs[Math.floor(Math.random() * songs.length)];
       setSong(random);
       setStoredTodaySong(random);
-      if (!session) incrementRecommendationCount();
+      if (!session) {
+        incrementRecommendationCount();
+        addTodayRecommendedSong(random);
+        setRecommendCount(getRecommendationCount());
+      }
       setCanRecommend(session ? true : getRecommendationCount() < MAX_RECOMMENDATION_PER_DAY);
       setIsSharedMode(false);
     } catch (error) {
@@ -209,14 +245,20 @@ export default function HomeContent() {
           {!song ? (
             <>
               <button
-                className={`w-32 h-32 ${canRecommend ? 'bg-white/20 hover:bg-white/30' : 'bg-gray-400/20 hover:bg-gray-400/30'} text-white rounded-full shadow-lg transition mb-8 flex items-center justify-center text-4xl border-2 border-white/40 backdrop-blur`}
+                className={`w-32 h-32 ${canRecommend ? 'bg-white/20 hover:bg-white/30' : 'bg-gray-400/20 hover:bg-gray-400/30'} text-white rounded-full shadow-lg transition mb-4 flex items-center justify-center text-4xl border-2 border-white/40 backdrop-blur`}
                 onClick={handleRecommendClick}
                 aria-label="오늘의 인디 한 곡 추천받기"
               >
                 {canRecommend ? '🎵' : '⏰'}
               </button>
-              <div className="mb-8 text-white/90 text-base text-center font-medium">
+              <div className="mb-2 text-white/90 text-base text-center font-medium">
                 당신의 하루를 바꿔줄 한국 인디 음악을 발견하세요
+              </div>
+              <div className="mb-8 text-white/80 text-base text-center font-medium">
+                하루에 10곡의 음악을 추천 받을 수 있어요
+              </div>
+              <div className="mb-4 text-white/80 text-sm text-center font-medium">
+                {!session && `${recommendCount + 1}/${MAX_RECOMMENDATION_PER_DAY}`}
               </div>
             </>
           ) : (
