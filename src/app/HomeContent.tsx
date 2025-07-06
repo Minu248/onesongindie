@@ -2,7 +2,7 @@
 import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { signIn, signOut } from "next-auth/react";
 import { useSession } from "next-auth/react";
 
 
@@ -287,6 +287,15 @@ export default function HomeContent() {
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-black text-white px-4 py-2 rounded shadow-lg text-sm z-50 animate-fade-in">
           {toast}
         </div>
+      )}
+      {session && (
+        <button
+          onClick={() => signOut()}
+          className="fixed bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 text-xs rounded-full bg-gray-200 text-gray-700 shadow z-50"
+          style={{ minWidth: 80 }}
+        >
+          로그아웃
+        </button>
       )}
     </main>
   );
