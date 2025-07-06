@@ -16,29 +16,13 @@ export const metadata = {
   title: "들어볼래? 한 곡 Indie",
   description: "당신의 하루를 바꿔줄 오늘 한 곡",
   metadataBase: new URL('https://onesongindie.com'),
-  openGraph: {
-    title: "들어볼래? 한 곡 Indie",
-    description: "당신의 하루를 바꿔줄 오늘 한 곡",
-    url: "https://onesongindie.com",
-    type: "website",
-    siteName: "들어볼래? 한 곡 Indie",
-    images: [
-      {
-        url: "https://onesongindie.com/og-image.png",
-        width: 885,
-        height: 460,
-        alt: "들어볼래? 한 곡 Indie 오픈그래프 이미지"
-      }
-    ]
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "들어볼래? 한 곡 Indie",
-    description: "당신의 하루를 바꿔줄 오늘 한 곡",
-    images: ["https://onesongindie.com/og-image.png"],
-  },
   icons: {
-    icon: "/favicon.png"
+    icon: [
+      { url: '/favicon.png', sizes: '32x32', type: 'image/png' },
+      { url: '/icon-512x512.png', sizes: '512x512', type: 'image/png' }
+    ],
+    shortcut: '/favicon.png',
+    apple: '/icon-512x512.png',
   },
   manifest: "/manifest.json",
 };

@@ -33,6 +33,14 @@ export async function generateMetadata({ searchParams }) {
         description: `친구가 추천한 한국 인디 노래: ${title} - ${artist}`,
         images: ["https://onesongindie.com/og-image.png"],
       },
+      icons: {
+        icon: [
+          { url: '/favicon.png', sizes: '32x32', type: 'image/png' },
+          { url: '/icon-512x512.png', sizes: '512x512', type: 'image/png' }
+        ],
+        shortcut: '/favicon.png',
+        apple: '/icon-512x512.png',
+      },
     };
   }
   
@@ -60,6 +68,14 @@ export async function generateMetadata({ searchParams }) {
       title: "들어볼래? 한 곡 Indie",
       description: "당신의 하루를 바꿔줄 오늘 한 곡",
       images: ["https://onesongindie.com/og-image.png"],
+    },
+    icons: {
+      icon: [
+        { url: '/favicon.png', sizes: '32x32', type: 'image/png' },
+        { url: '/icon-512x512.png', sizes: '512x512', type: 'image/png' }
+      ],
+      shortcut: '/favicon.png',
+      apple: '/icon-512x512.png',
     },
   };
 }
