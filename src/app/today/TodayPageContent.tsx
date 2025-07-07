@@ -1,7 +1,7 @@
 "use client";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 // LP 아이콘 컴포넌트 복사
 const LpIcon = () => (
@@ -42,6 +42,27 @@ export default function TodayPageContent() {
   const [toast, setToast] = useState("");
   const recommendCount = getRecommendationCount();
   const router = useRouter();
+  const [showPlatformPopup, setShowPlatformPopup] = useState(false);
+  const popupRef = useRef<HTMLDivElement>(null);
+
+  // 팝업 바깥 클릭 시 닫힘
+  useEffect(() => {
+    if (!showPlatformPopup) return;
+    const handleClick = (e: MouseEvent) => {
+      if (popupRef.current && !popupRef.current.contains(e.target as Node)) {
+        setShowPlatformPopup(false);
+      }
+    };
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setShowPlatformPopup(false);
+    };
+    document.addEventListener("mousedown", handleClick);
+    document.addEventListener("keydown", handleEsc);
+    return () => {
+      document.removeEventListener("mousedown", handleClick);
+      document.removeEventListener("keydown", handleEsc);
+    };
+  }, [showPlatformPopup]);
 
   if (!title || !artist || !link) {
     return (
@@ -78,14 +99,12 @@ export default function TodayPageContent() {
     setTimeout(() => setToast(""), 1500);
   };
 
-  // 유튜브 뮤직 검색
-  const openYouTubeMusic = () => {
-    const searchQuery = `${title} ${artist}`;
-    const youtubeMusicUrl = `https://music.youtube.com/search?q=${encodeURIComponent(searchQuery)}&utm_source=onesongindie.com&utm_medium=wkdalsdn5656_gmail`;
-    window.open(youtubeMusicUrl, '_blank');
-    setToast("YouTube Music에서 검색 중이에요!");
-    setTimeout(() => setToast(""), 1500);
-  };
+  // 플랫폼별 검색 URL 생성
+  const getSearchQuery = () => `${title} ${artist}`;
+  const getYoutubeMusicUrl = () => `https://music.youtube.com/search?q=${encodeURIComponent(getSearchQuery())}&utm_source=onesongindie.com&utm_medium=button&utm_campaign=music_search`;
+  const getAppleMusicUrl = () => `https://music.apple.com/kr/search?term=${encodeURIComponent(getSearchQuery())}&utm_source=onesongindie.com&utm_medium=button&utm_campaign=music_search`;
+  const getMelonUrl = () => `https://www.melon.com/search/total/index.htm?q=${encodeURIComponent(getSearchQuery())}&section=&mwkLogType=T&utm_source=onesongindie.com&utm_medium=button&utm_campaign=music_search`;
+  const getVibeUrl = () => `https://vibe.naver.com/search?query=${encodeURIComponent(getSearchQuery())}&utm_source=onesongindie.com&utm_medium=button&utm_campaign=music_search`;
 
   // 곡 추천 버튼 동작 (홈과 동일)
   const fetchSongAndRedirect = async () => {
@@ -159,18 +178,12 @@ export default function TodayPageContent() {
           </div>
         )}
         <div className="mb-4 text-[#A033FF]">오늘의 추천곡이에요 🎧</div>
-        <div className="flex gap-4 mb-2">
-          <button
-            className="text-2xl px-4 py-2 rounded-full bg-white/60 hover:bg-white/80 shadow border border-[#FF2A68] text-[#FF2A68]"
-            onClick={likeSong}
-            aria-label="좋아요"
-          >
-            ❤️
-          </button>
+        <div className="flex gap-4 mb-2 relative">
           <button
             className="px-4 py-2 rounded-full bg-white/60 hover:bg-white/80 shadow border border-[#FF0000] flex items-center justify-center"
-            onClick={openYouTubeMusic}
-            aria-label="YouTube Music에서 검색"
+            onClick={() => setShowPlatformPopup(v => !v)}
+            aria-label="음원 플랫폼에서 검색"
+            type="button"
           >
             <img 
               src="/youtube_music.png" 
@@ -179,12 +192,44 @@ export default function TodayPageContent() {
             />
           </button>
           <button
+            className="text-2xl px-4 py-2 rounded-full bg-white/60 hover:bg-white/80 shadow border border-[#FF2A68] text-[#FF2A68]"
+            onClick={likeSong}
+            aria-label="좋아요"
+          >
+            ❤️
+          </button>
+          <button
             className="text-2xl px-4 py-2 rounded-full bg-white/60 hover:bg-white/80 shadow border border-[#0B63F6] text-[#0B63F6]"
             onClick={shareSong}
             aria-label="공유"
           >
             🔗
           </button>
+          {/* 플랫폼 선택 팝업 */}
+          {showPlatformPopup && (
+            <div ref={popupRef} className="absolute left-0 top-12 z-50 bg-white/90 rounded-xl shadow-lg px-6 py-4 flex gap-6 items-center border border-gray-200 animate-fade-in">
+              {/* YouTube Music */}
+              <button onClick={() => { window.open(getYoutubeMusicUrl(), '_blank'); setShowPlatformPopup(false); }} className="flex flex-col items-center group focus:outline-none">
+                <img src="/youtube_music.png" alt="YouTube Music" className="w-10 h-10 mb-1 group-hover:scale-110 group-hover:shadow-lg transition" />
+                <span className="text-xs text-gray-700">YouTube Music</span>
+              </button>
+              {/* Apple Music */}
+              <button onClick={() => { window.open(getAppleMusicUrl(), '_blank'); setShowPlatformPopup(false); }} className="flex flex-col items-center group focus:outline-none">
+                <img src="/apple_music.png" alt="Apple Music" className="w-10 h-10 mb-1 group-hover:scale-110 group-hover:shadow-lg transition" />
+                <span className="text-xs text-gray-700">Apple Music</span>
+              </button>
+              {/* Melon */}
+              <button onClick={() => { window.open(getMelonUrl(), '_blank'); setShowPlatformPopup(false); }} className="flex flex-col items-center group focus:outline-none">
+                <img src="/melon.png" alt="Melon" className="w-10 h-10 mb-1 group-hover:scale-110 group-hover:shadow-lg transition" />
+                <span className="text-xs text-gray-700">Melon</span>
+              </button>
+              {/* Vibe */}
+              <button onClick={() => { window.open(getVibeUrl(), '_blank'); setShowPlatformPopup(false); }} className="flex flex-col items-center group focus:outline-none">
+                <img src="/vibe.png" alt="Vibe" className="w-10 h-10 mb-1 group-hover:scale-110 group-hover:shadow-lg transition" />
+                <span className="text-xs text-gray-700">Vibe</span>
+              </button>
+            </div>
+          )}
         </div>
         <Link
           href="/playlist"
@@ -205,7 +250,7 @@ export default function TodayPageContent() {
             className="w-full flex justify-center"
           >
             <button
-              className="w-full bg-[#A033FF] text-white rounded-full px-6 py-3 shadow-md hover:bg-[#7c25c9] transition text-base font-semibold"
+              className="w-full bg-[#fc26d5] text-white rounded-full px-6 py-3 shadow-md hover:bg-[#7c25c9] transition text-base font-semibold"
               type="button"
             >
               나만 알고 있는 인디 노래를 추천해주세요
