@@ -62,7 +62,11 @@ export default function TodaySongsPage() {
           ))}
         </div>
       )}
-      <Link href="/" className="mt-8 text-[#A033FF] underline">홈으로 돌아가기</Link>
+      <Link href="/" className="mt-8 flex justify-center w-full">
+        <button className="w-full max-w-xs bg-[#A033FF] text-white rounded-full px-6 py-3 shadow-md hover:bg-[#7c25c9] transition text-base font-semibold border-2 border-white/80">
+          홈으로 돌아가기
+        </button>
+      </Link>
     </main>
   );
 }
