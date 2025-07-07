@@ -331,11 +331,15 @@ export default function HomeContent() {
                   ❤️
                 </button>
                 <button
-                  className="text-2xl px-4 py-2 rounded-full bg-white/60 hover:bg-white/80 shadow border border-[#FF0000] text-[#FF0000]"
+                  className="px-4 py-2 rounded-full bg-white/60 hover:bg-white/80 shadow border border-[#FF0000] flex items-center justify-center"
                   onClick={openYouTubeMusic}
                   aria-label="YouTube Music에서 검색"
                 >
-                  🎵
+                  <img 
+                    src="/youtube_music.png" 
+                    alt="YouTube Music" 
+                    className="w-6 h-6"
+                  />
                 </button>
                 <button
                   className="text-2xl px-4 py-2 rounded-full bg-white/60 hover:bg-white/80 shadow border border-[#0B63F6] text-[#0B63F6]"
