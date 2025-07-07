@@ -79,7 +79,7 @@ const setStoredTodaySong = (song: Song) => {
 };
 
 // 오늘 추천받은 곡 리스트 관리
-const getTodayRecommendedSongs = (): string[] => {
+const getTodayRecommendedSongs = (): Song[] => {
   const lastDate = localStorage.getItem("lastRecommendationDate");
   const today = getTodayString();
   if (lastDate !== today) {
@@ -91,9 +91,12 @@ const getTodayRecommendedSongs = (): string[] => {
 };
 
 const addTodayRecommendedSong = (song: Song) => {
-  const list = getTodayRecommendedSongs();
-  list.push(song["링크"]);
-  localStorage.setItem("todayRecommendedSongs", JSON.stringify(list));
+  const list = JSON.parse(localStorage.getItem("todayRecommendedSongs") || "[]");
+  // 이미 동일한 링크가 있으면 추가하지 않음
+  if (!list.find((s: Song) => s["링크"] === song["링크"])) {
+    list.push(song);
+    localStorage.setItem("todayRecommendedSongs", JSON.stringify(list));
+  }
 };
 
 export default function HomeContent() {
@@ -148,8 +151,8 @@ export default function HomeContent() {
       let songs: Song[] = await res.json();
       if (songs.length === 0) throw new Error("곡 데이터가 없습니다");
       if (!session) {
-        const recommendedLinks = getTodayRecommendedSongs();
-        songs = songs.filter(song => !recommendedLinks.includes(song["링크"]));
+        const recommendedSongs = getTodayRecommendedSongs();
+        songs = songs.filter(song => !recommendedSongs.find(s => s["링크"] === song["링크"]));
         if (songs.length === 0) {
           setToast("더 이상 추천할 곡이 없습니다!");
           setTimeout(() => setToast(""), 3000);

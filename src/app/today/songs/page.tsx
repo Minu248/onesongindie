@@ -12,27 +12,9 @@ export default function TodaySongsPage() {
   const [songs, setSongs] = useState<Song[]>([]);
 
   useEffect(() => {
-    const todaySongs = JSON.parse(localStorage.getItem("todayRecommendedSongs") || "[]");
-    // todaySongs는 링크 배열이므로, todaySong 객체도 불러와서 중복 없이 리스트 생성
-    const songObjs: Song[] = [];
-    todaySongs.forEach((link: string) => {
-      // localStorage에 저장된 todaySong 객체들 중 해당 링크와 일치하는 곡을 찾아 추가
-      // (실제 추천 시 todaySong을 덮어쓰므로, 링크만 저장된 경우가 많음)
-      // 여기서는 likedSongs, todaySong 등에서 최대한 정보 복원
-      const liked = JSON.parse(localStorage.getItem("likedSongs") || "[]");
-      const found = liked.find((s: Song) => s["링크"] === link);
-      if (found) songObjs.push(found);
-      else {
-        // todaySong에 있는 경우
-        const todaySong = localStorage.getItem("todaySong");
-        if (todaySong) {
-          const obj = JSON.parse(todaySong);
-          if (obj["링크"] === link) songObjs.push(obj);
-        }
-      }
-    });
-    // 중복 제거
-    const unique = songObjs.filter((v, i, arr) => arr.findIndex(s => s["링크"] === v["링크"]) === i);
+    const todaySongs: Song[] = JSON.parse(localStorage.getItem("todayRecommendedSongs") || "[]");
+    // 중복 제거 (링크 기준)
+    const unique = todaySongs.filter((v, i, arr) => arr.findIndex(s => s["링크"] === v["링크"]) === i);
     setSongs(unique);
   }, []);
 

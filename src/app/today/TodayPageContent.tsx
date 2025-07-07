@@ -27,6 +27,13 @@ const getRecommendationCount = () => {
   return parseInt(localStorage.getItem("recommendationCount") || "0", 10);
 };
 
+// Song 타입 정의 추가
+interface Song {
+  "곡 제목": string;
+  "아티스트": string;
+  "링크": string;
+}
+
 export default function TodayPageContent() {
   const searchParams = useSearchParams();
   const title = searchParams.get("title");
@@ -87,8 +94,8 @@ export default function TodayPageContent() {
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       let songs = await res.json();
       if (songs.length === 0) throw new Error("곡 데이터가 없습니다");
-      const recommendedLinks = JSON.parse(localStorage.getItem("todayRecommendedSongs") || "[]");
-      songs = songs.filter((song: any) => !recommendedLinks.includes(song["링크"]));
+      const recommendedSongs: Song[] = JSON.parse(localStorage.getItem("todayRecommendedSongs") || "[]");
+      songs = songs.filter((song: Song) => !recommendedSongs.find(s => s["링크"] === song["링크"]));
       if (songs.length === 0) {
         setToast("더 이상 추천할 곡이 없습니다!");
         setTimeout(() => setToast(""), 3000);
@@ -99,9 +106,9 @@ export default function TodayPageContent() {
       // 카운트 증가
       const count = getRecommendationCount() + 1;
       localStorage.setItem("recommendationCount", count.toString());
-      // 추천곡 중복 관리
-      recommendedLinks.push(random["링크"]);
-      localStorage.setItem("todayRecommendedSongs", JSON.stringify(recommendedLinks));
+      // 추천곡 중복 관리 (곡 전체 객체 누적)
+      recommendedSongs.push(random);
+      localStorage.setItem("todayRecommendedSongs", JSON.stringify(recommendedSongs));
       // /today로 이동
       router.push(`/today?title=${encodeURIComponent(random["곡 제목"])}&artist=${encodeURIComponent(random["아티스트"])}&link=${encodeURIComponent(random["링크"])}${searchParams.get("login") ? '&login=1' : ''}`);
     } catch (error) {
