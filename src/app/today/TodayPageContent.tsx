@@ -42,27 +42,6 @@ export default function TodayPageContent() {
   const [toast, setToast] = useState("");
   const recommendCount = getRecommendationCount();
   const router = useRouter();
-  const [showPlatformPopup, setShowPlatformPopup] = useState(false);
-  const popupRef = useRef<HTMLDivElement>(null);
-
-  // 팝업 바깥 클릭 시 닫힘
-  useEffect(() => {
-    if (!showPlatformPopup) return;
-    const handleClick = (e: MouseEvent) => {
-      if (popupRef.current && !popupRef.current.contains(e.target as Node)) {
-        setShowPlatformPopup(false);
-      }
-    };
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setShowPlatformPopup(false);
-    };
-    document.addEventListener("mousedown", handleClick);
-    document.addEventListener("keydown", handleEsc);
-    return () => {
-      document.removeEventListener("mousedown", handleClick);
-      document.removeEventListener("keydown", handleEsc);
-    };
-  }, [showPlatformPopup]);
 
   if (!title || !artist || !link) {
     return (
@@ -103,7 +82,14 @@ export default function TodayPageContent() {
   const getSearchQuery = () => `${title} ${artist}`;
   const getYoutubeMusicUrl = () => `https://music.youtube.com/search?q=${encodeURIComponent(getSearchQuery())}&utm_source=onesongindie.com&utm_medium=button&utm_campaign=music_search`;
   const getAppleMusicUrl = () => `https://music.apple.com/kr/search?term=${encodeURIComponent(getSearchQuery())}&utm_source=onesongindie.com&utm_medium=button&utm_campaign=music_search`;
-  const getMelonUrl = () => `https://www.melon.com/search/total/index.htm?q=${encodeURIComponent(getSearchQuery())}&section=&mwkLogType=T&utm_source=onesongindie.com&utm_medium=button&utm_campaign=music_search`;
+  const getMelonUrl = (query: string) => {
+    if (typeof navigator === 'undefined') return '';
+    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+      return `https://search.melon.com/search/searchMcom.htm?s=${encodeURIComponent(query)}&kkoSpl=Y&kkoDpType=&mwkLogType=C`;
+    } else {
+      return `https://www.melon.com/search/total/index.htm?q=${encodeURIComponent(query)}&section=&mwkLogType=T`;
+    }
+  };
   const getVibeUrl = () => `https://vibe.naver.com/search?query=${encodeURIComponent(getSearchQuery())}&utm_source=onesongindie.com&utm_medium=button&utm_campaign=music_search`;
 
   // 곡 추천 버튼 동작 (홈과 동일)
@@ -177,20 +163,26 @@ export default function TodayPageContent() {
             />
           </div>
         )}
-        <div className="mb-4 text-[#A033FF]">오늘의 추천곡이에요 🎧</div>
-        <div className="flex gap-4 mb-2 relative">
-          <button
-            className="w-14 h-14 rounded-[10px] bg-white/60 hover:bg-white/80 shadow border border-[#FF0000] flex items-center justify-center"
-            onClick={() => setShowPlatformPopup(v => !v)}
-            aria-label="음원 플랫폼에서 검색"
-            type="button"
-          >
-            <img 
-              src="/youtube_music.png" 
-              alt="YouTube Music" 
-              className="w-6 h-6 object-contain" 
-            />
+        {/* 플랫폼 아이콘 버튼 */}
+        <div className="flex gap-3 justify-center mb-4">
+          {/* YouTube Music */}
+          <button onClick={() => window.open(`https://music.youtube.com/search?q=${encodeURIComponent(title + ' ' + artist)}&utm_source=onesongindie.com&utm_medium=button&utm_campaign=music_search`, '_blank')} className="w-10 h-10 p-1 rounded-[10px] focus:outline-none">
+            <img src="/youtube_music.png" alt="YouTube Music" className="w-full h-full object-contain rounded-[10px]" />
           </button>
+          {/* Apple Music */}
+          <button onClick={() => window.open(`https://music.apple.com/kr/search?term=${encodeURIComponent(title + ' ' + artist)}&utm_source=onesongindie.com&utm_medium=button&utm_campaign=music_search`, '_blank')} className="w-10 h-10 p-1 rounded-[10px] focus:outline-none">
+            <img src="/apple_music.png" alt="Apple Music" className="w-full h-full object-contain rounded-[10px]" />
+          </button>
+          {/* Melon */}
+          <button onClick={() => window.open(getMelonUrl(title + ' ' + artist), '_blank')} className="w-10 h-10 p-1 rounded-[10px] focus:outline-none">
+            <img src="/melon.png" alt="Melon" className="w-full h-full object-contain rounded-[10px]" />
+          </button>
+          {/* Vibe */}
+          <button onClick={() => window.open(`https://vibe.naver.com/search?query=${encodeURIComponent(title + ' ' + artist)}&utm_source=onesongindie.com&utm_medium=button&utm_campaign=music_search`, '_blank')} className="w-10 h-10 p-1 rounded-[10px] focus:outline-none">
+            <img src="/vibe.png" alt="Vibe" className="w-full h-full object-contain rounded-[10px]" />
+          </button>
+        </div>
+        <div className="flex gap-4 mb-2 relative">
           <button
             className="w-14 h-14 rounded-[10px] text-2xl flex items-center justify-center bg-white/60 hover:bg-white/80 shadow border border-[#FF2A68] text-[#FF2A68]"
             onClick={likeSong}
@@ -205,27 +197,6 @@ export default function TodayPageContent() {
           >
             🔗
           </button>
-          {/* 플랫폼 선택 팝업 */}
-          {showPlatformPopup && (
-            <div ref={popupRef} className="absolute left-1/2 -translate-x-1/2 top-12 z-50 w-[340px] max-w-[calc(100vw-32px)] bg-[#A033FF]/90 rounded-xl shadow-lg px-6 py-4 flex gap-4 items-center border border-gray-200 animate-fade-in">
-              {/* YouTube Music */}
-              <button onClick={() => { window.open(getYoutubeMusicUrl(), '_blank'); setShowPlatformPopup(false); }} className="w-14 h-14 p-1 flex items-center justify-center rounded-[10px] focus:outline-none">
-                <img src="/youtube_music.png" alt="YouTube Music" className="w-full h-full object-contain max-w-full max-h-full" />
-              </button>
-              {/* Apple Music */}
-              <button onClick={() => { window.open(getAppleMusicUrl(), '_blank'); setShowPlatformPopup(false); }} className="w-14 h-14 p-1 flex items-center justify-center rounded-[10px] focus:outline-none">
-                <img src="/apple_music.png" alt="Apple Music" className="w-full h-full object-contain max-w-full max-h-full" />
-              </button>
-              {/* Melon */}
-              <button onClick={() => { window.open(getMelonUrl(), '_blank'); setShowPlatformPopup(false); }} className="w-14 h-14 p-1 flex items-center justify-center rounded-[10px] focus:outline-none">
-                <img src="/melon.png" alt="Melon" className="w-full h-full object-contain max-w-full max-h-full" />
-              </button>
-              {/* Vibe */}
-              <button onClick={() => { window.open(getVibeUrl(), '_blank'); setShowPlatformPopup(false); }} className="w-14 h-14 p-1 flex items-center justify-center rounded-[10px] focus:outline-none">
-                <img src="/vibe.png" alt="Vibe" className="w-full h-full object-contain max-w-full max-h-full" />
-              </button>
-            </div>
-          )}
         </div>
         <Link
           href="/playlist"

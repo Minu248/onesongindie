@@ -25,42 +25,44 @@ export default function TodaySongsPage() {
         <div className="text-white/80 mb-8">오늘 추천받은 곡이 없습니다.</div>
       ) : (
         <div className="w-full max-w-2xl flex flex-col gap-6">
-          {songs.map((song, idx) => (
-            <div key={idx} className="bg-white/80 rounded-xl shadow-lg p-5 flex flex-col items-center backdrop-blur-md overflow-hidden">
-              <div className="mb-1 text-lg font-semibold text-[#A033FF]">{song["곡 제목"]}</div>
-              <div className="mb-3 text-gray-700">{song["아티스트"]}</div>
-              {song["링크"] && song["링크"].includes("youtu") && (
-                <div className="w-full max-w-xl mx-auto aspect-[16/9] mb-2">
-                  <iframe
-                    className="w-full h-full rounded-lg"
-                    src={`https://www.youtube.com/embed/${getYoutubeId(song["링크"])}?autoplay=0`}
-                    title="YouTube video player"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
+          {songs
+            .filter(song => song["곡 제목"] && song["아티스트"] && song["링크"])
+            .map((song, idx) => (
+              <div key={idx} className="bg-white/80 rounded-xl shadow-lg p-5 flex flex-col items-center backdrop-blur-md overflow-hidden">
+                <div className="mb-1 text-lg font-semibold text-[#A033FF]">{song["곡 제목"]}</div>
+                <div className="mb-3 text-gray-700">{song["아티스트"]}</div>
+                {song["링크"] && song["링크"].includes("youtu") && (
+                  <div className="w-full max-w-xl mx-auto aspect-[16/9] mb-2">
+                    <iframe
+                      className="w-full h-full rounded-lg"
+                      src={`https://www.youtube.com/embed/${getYoutubeId(song["링크"])}?autoplay=0`}
+                      title="YouTube video player"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                )}
+                {/* 플랫폼 아이콘 버튼 */}
+                <div className="flex gap-3 mt-2">
+                  {/* YouTube Music */}
+                  <button onClick={() => window.open(`https://music.youtube.com/search?q=${encodeURIComponent(song["곡 제목"] + ' ' + song["아티스트"])}&utm_source=onesongindie.com&utm_medium=button&utm_campaign=music_search`, '_blank')} className="w-8 h-8 p-0.5 rounded-[10px] focus:outline-none">
+                    <img src="/youtube_music.png" alt="YouTube Music" className="w-full h-full object-contain rounded-[10px]" />
+                  </button>
+                  {/* Apple Music */}
+                  <button onClick={() => window.open(`https://music.apple.com/kr/search?term=${encodeURIComponent(song["곡 제목"] + ' ' + song["아티스트"])}&utm_source=onesongindie.com&utm_medium=button&utm_campaign=music_search`, '_blank')} className="w-8 h-8 p-0.5 rounded-[10px] focus:outline-none">
+                    <img src="/apple_music.png" alt="Apple Music" className="w-full h-full object-contain rounded-[10px]" />
+                  </button>
+                  {/* Melon */}
+                  <button onClick={() => window.open(getMelonUrl(song["곡 제목"] + ' ' + song["아티스트"]), '_blank')} className="w-8 h-8 p-0.5 rounded-[10px] focus:outline-none">
+                    <img src="/melon.png" alt="Melon" className="w-full h-full object-contain rounded-[10px]" />
+                  </button>
+                  {/* Vibe */}
+                  <button onClick={() => window.open(`https://vibe.naver.com/search?query=${encodeURIComponent(song["곡 제목"] + ' ' + song["아티스트"])}&utm_source=onesongindie.com&utm_medium=button&utm_campaign=music_search`, '_blank')} className="w-8 h-8 p-0.5 rounded-[10px] focus:outline-none">
+                    <img src="/vibe.png" alt="Vibe" className="w-full h-full object-contain rounded-[10px]" />
+                  </button>
                 </div>
-              )}
-              {/* 플랫폼 아이콘 버튼 */}
-              <div className="flex gap-3 mt-2">
-                {/* YouTube Music */}
-                <button onClick={() => window.open(`https://music.youtube.com/search?q=${encodeURIComponent(song["곡 제목"] + ' ' + song["아티스트"])}&utm_source=onesongindie.com&utm_medium=button&utm_campaign=music_search`, '_blank')} className="w-8 h-8 p-0.5 rounded-[10px] focus:outline-none">
-                  <img src="/youtube_music.png" alt="YouTube Music" className="w-full h-full object-contain rounded-[10px]" />
-                </button>
-                {/* Apple Music */}
-                <button onClick={() => window.open(`https://music.apple.com/kr/search?term=${encodeURIComponent(song["곡 제목"] + ' ' + song["아티스트"])}&utm_source=onesongindie.com&utm_medium=button&utm_campaign=music_search`, '_blank')} className="w-8 h-8 p-0.5 rounded-[10px] focus:outline-none">
-                  <img src="/apple_music.png" alt="Apple Music" className="w-full h-full object-contain rounded-[10px]" />
-                </button>
-                {/* Melon */}
-                <button onClick={() => window.open(`https://www.melon.com/search/total/index.htm?q=${encodeURIComponent(song["곡 제목"] + ' ' + song["아티스트"])}&section=&mwkLogType=T&utm_source=onesongindie.com&utm_medium=button&utm_campaign=music_search`, '_blank')} className="w-8 h-8 p-0.5 rounded-[10px] focus:outline-none">
-                  <img src="/melon.png" alt="Melon" className="w-full h-full object-contain rounded-[10px]" />
-                </button>
-                {/* Vibe */}
-                <button onClick={() => window.open(`https://vibe.naver.com/search?query=${encodeURIComponent(song["곡 제목"] + ' ' + song["아티스트"])}&utm_source=onesongindie.com&utm_medium=button&utm_campaign=music_search`, '_blank')} className="w-8 h-8 p-0.5 rounded-[10px] focus:outline-none">
-                  <img src="/vibe.png" alt="Vibe" className="w-full h-full object-contain rounded-[10px]" />
-                </button>
               </div>
-            </div>
-          ))}
+            ))}
         </div>
       )}
       <Link href="/" className="mt-8 flex justify-center w-full">
@@ -75,4 +77,17 @@ export default function TodaySongsPage() {
 function getYoutubeId(url: string) {
   const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)?)([\w-]{11})/);
   return match ? match[1] : null;
+}
+
+function isMobile() {
+  if (typeof navigator === 'undefined') return false;
+  return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+}
+
+function getMelonUrl(query: string) {
+  if (isMobile()) {
+    return `https://search.melon.com/search/searchMcom.htm?s=${encodeURIComponent(query)}&kkoSpl=Y&kkoDpType=&mwkLogType=C`;
+  } else {
+    return `https://www.melon.com/search/total/index.htm?q=${encodeURIComponent(query)}&section=&mwkLogType=T`;
+  }
 } 
