@@ -110,6 +110,9 @@ export default function TodayPageContent() {
     }
   };
 
+  // 추천 가능 여부 (홈과 동일하게)
+  const canRecommend = recommendCount < MAX_RECOMMENDATION_PER_DAY;
+
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#FF2A68] via-[#A033FF] to-[#0B63F6] px-4">
       <div className="text-center mb-8">
@@ -117,11 +120,12 @@ export default function TodayPageContent() {
         <div className="text-5xl font-bold text-white drop-shadow">한 곡 Indie</div>
       </div>
       <button
-        className={`w-48 h-14 bg-white/20 hover:bg-white/30 text-white rounded-full shadow-lg transition mb-8 flex items-center justify-center text-lg border-2 border-white/40 backdrop-blur font-semibold`}
+        className={`w-32 h-32 ${canRecommend ? 'bg-white/20 hover:bg-white/30' : 'bg-gray-400/20 hover:bg-gray-400/30'} text-white rounded-full shadow-lg transition mb-4 flex items-center justify-center text-4xl border-2 border-white/40 backdrop-blur`}
         onClick={fetchSongAndRedirect}
         aria-label="오늘의 인디 한 곡 추천받기"
+        disabled={!canRecommend}
       >
-        오늘의 곡 추천 받기
+        {canRecommend ? '🎵' : '⏰'}
       </button>
       <div className="flex items-center justify-center mb-4">
         <LpIcon />
