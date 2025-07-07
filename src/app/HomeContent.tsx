@@ -143,7 +143,7 @@ export default function HomeContent() {
 
   const fetchSongAndRedirect = async () => {
     try {
-      const res = await fetch("https://script.google.com/macros/s/AKfycbzxIaYiGGd49wuNU4E7E2dKi7r5e6achx5ARxcPa0T3MXC38o0yQ5tocm5tUMQ8MBn0FA/exec");
+      const res = await fetch("https://api.sheetbest.com/sheets/88c2b9c7-8d30-462b-ae7c-a4859aaf6955");
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       let songs: Song[] = await res.json();
       if (songs.length === 0) throw new Error("곡 데이터가 없습니다");
