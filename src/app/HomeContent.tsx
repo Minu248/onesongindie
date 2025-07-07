@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { signIn, signOut } from "next-auth/react";
 import { useSession } from "next-auth/react";
 
@@ -99,6 +99,7 @@ const addTodayRecommendedSong = (song: Song) => {
 export default function HomeContent() {
   const searchParams = useSearchParams();
   const { data: session } = useSession();
+  const router = useRouter();
   const [song, setSong] = useState<Song | null>(null);
   const [toast, setToast] = useState("");
   const [isSharedMode, setIsSharedMode] = useState(false);
@@ -140,21 +141,12 @@ export default function HomeContent() {
     }
   }, [searchParams]);
 
-  const fetchSong = async () => {
+  const fetchSongAndRedirect = async () => {
     try {
-      const res = await fetch("https://api.sheetbest.com/sheets/88c2b9c7-8d30-462b-ae7c-a4859aaf6955");
-      
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
-      
+      const res = await fetch("https://script.google.com/macros/s/AKfycbzxIaYiGGd49wuNU4E7E2dKi7r5e6achx5ARxcPa0T3MXC38o0yQ5tocm5tUMQ8MBn0FA/exec");
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       let songs: Song[] = await res.json();
-      
-      if (songs.length === 0) {
-        throw new Error("곡 데이터가 없습니다");
-      }
-      
-      // 오늘 추천받은 곡 제외
+      if (songs.length === 0) throw new Error("곡 데이터가 없습니다");
       if (!session) {
         const recommendedLinks = getTodayRecommendedSongs();
         songs = songs.filter(song => !recommendedLinks.includes(song["링크"]));
@@ -164,9 +156,7 @@ export default function HomeContent() {
           return;
         }
       }
-      
       const random = songs[Math.floor(Math.random() * songs.length)];
-      setSong(random);
       setStoredTodaySong(random);
       if (!session) {
         incrementRecommendationCount();
@@ -175,6 +165,8 @@ export default function HomeContent() {
       }
       setCanRecommend(session ? true : getRecommendationCount() < MAX_RECOMMENDATION_PER_DAY);
       setIsSharedMode(false);
+      // 곡 정보 쿼리 파라미터로 /today로 이동
+      router.push(`/today?title=${encodeURIComponent(random["곡 제목"])}&artist=${encodeURIComponent(random["아티스트"])}&link=${encodeURIComponent(random["링크"])}${session ? '&login=1' : ''}`);
     } catch (error) {
       console.error("fetchSong 에러:", error);
       setToast("곡을 불러오는 중 오류가 발생했습니다");
@@ -188,7 +180,7 @@ export default function HomeContent() {
       setTimeout(() => setToast(""), 3000);
       return;
     }
-    fetchSong();
+    fetchSongAndRedirect();
   };
 
   const likeSong = () => {
