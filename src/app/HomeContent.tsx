@@ -210,6 +210,15 @@ export default function HomeContent() {
     setTimeout(() => setToast(""), 1500);
   };
 
+  const openYouTubeMusic = () => {
+    if (!song) return;
+    const searchQuery = `${song["곡 제목"]} ${song["아티스트"]}`;
+    const youtubeMusicUrl = `https://music.youtube.com/search?q=${encodeURIComponent(searchQuery)}&utm_source=onesongindie.com&utm_medium=wkdalsdn5656_gmail`;
+    window.open(youtubeMusicUrl, '_blank');
+    setToast("YouTube Music에서 검색 중이에요!");
+    setTimeout(() => setToast(""), 1500);
+  };
+
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#FF2A68] via-[#A033FF] to-[#0B63F6] px-4">
 
@@ -320,6 +329,13 @@ export default function HomeContent() {
                   aria-label="좋아요"
                 >
                   ❤️
+                </button>
+                <button
+                  className="text-2xl px-4 py-2 rounded-full bg-white/60 hover:bg-white/80 shadow border border-[#FF0000] text-[#FF0000]"
+                  onClick={openYouTubeMusic}
+                  aria-label="YouTube Music에서 검색"
+                >
+                  🎵
                 </button>
                 <button
                   className="text-2xl px-4 py-2 rounded-full bg-white/60 hover:bg-white/80 shadow border border-[#0B63F6] text-[#0B63F6]"
