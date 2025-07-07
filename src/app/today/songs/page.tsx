@@ -45,19 +45,15 @@ export default function TodaySongsPage() {
                 {/* 플랫폼 아이콘 버튼 */}
                 <div className="flex gap-3 mt-2">
                   {/* YouTube Music */}
-                  <button onClick={() => window.open(`https://music.youtube.com/search?q=${encodeURIComponent(song["곡 제목"] + ' ' + song["아티스트"])}&utm_source=onesongindie.com&utm_medium=button&utm_campaign=music_search`, '_blank')} className="w-8 h-8 p-0.5 rounded-[10px] focus:outline-none">
+                  <button onClick={() => window.open(`https://music.youtube.com/search?q=${encodeURIComponent(song["곡 제목"] + ' ' + song["아티스트"])}&utm_source=onesongindie.com&utm_medium=wkdalsdn5656_gamil&utm_campaign=music_search`, '_blank')} className="w-8 h-8 p-0.5 rounded-[10px] focus:outline-none">
                     <img src="/youtube_music.png" alt="YouTube Music" className="w-full h-full object-contain rounded-[10px]" />
                   </button>
                   {/* Apple Music */}
-                  <button onClick={() => window.open(`https://music.apple.com/kr/search?term=${encodeURIComponent(song["곡 제목"] + ' ' + song["아티스트"])}&utm_source=onesongindie.com&utm_medium=button&utm_campaign=music_search`, '_blank')} className="w-8 h-8 p-0.5 rounded-[10px] focus:outline-none">
+                  <button onClick={() => window.open(`https://music.apple.com/kr/search?term=${encodeURIComponent(song["곡 제목"] + ' ' + song["아티스트"])}&utm_source=onesongindie.com&utm_medium=wkdalsdn5656_gamil&utm_campaign=music_search`, '_blank')} className="w-8 h-8 p-0.5 rounded-[10px] focus:outline-none">
                     <img src="/apple_music.png" alt="Apple Music" className="w-full h-full object-contain rounded-[10px]" />
                   </button>
-                  {/* Melon */}
-                  <button onClick={() => window.open(getMelonUrl(song["곡 제목"] + ' ' + song["아티스트"]), '_blank')} className="w-8 h-8 p-0.5 rounded-[10px] focus:outline-none">
-                    <img src="/melon.png" alt="Melon" className="w-full h-full object-contain rounded-[10px]" />
-                  </button>
                   {/* Vibe */}
-                  <button onClick={() => window.open(`https://vibe.naver.com/search?query=${encodeURIComponent(song["곡 제목"] + ' ' + song["아티스트"])}&utm_source=onesongindie.com&utm_medium=button&utm_campaign=music_search`, '_blank')} className="w-8 h-8 p-0.5 rounded-[10px] focus:outline-none">
+                  <button onClick={() => window.open(`https://vibe.naver.com/search?query=${encodeURIComponent(song["곡 제목"] + ' ' + song["아티스트"])}&utm_source=onesongindie.com&utm_medium=wkdalsdn5656_gamil&utm_campaign=music_search`, '_blank')} className="w-8 h-8 p-0.5 rounded-[10px] focus:outline-none">
                     <img src="/vibe.png" alt="Vibe" className="w-full h-full object-contain rounded-[10px]" />
                   </button>
                 </div>
