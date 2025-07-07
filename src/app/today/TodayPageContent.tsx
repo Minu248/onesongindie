@@ -207,26 +207,22 @@ export default function TodayPageContent() {
           </button>
           {/* 플랫폼 선택 팝업 */}
           {showPlatformPopup && (
-            <div ref={popupRef} className="absolute left-0 top-12 z-50 w-[340px] bg-[#A033FF]/90 rounded-xl shadow-lg px-8 py-4 flex gap-6 items-center border border-gray-200 animate-fade-in">
+            <div ref={popupRef} className="absolute left-1/2 -translate-x-1/2 top-12 z-50 w-[340px] max-w-[calc(100vw-32px)] bg-[#A033FF]/90 rounded-xl shadow-lg px-6 py-4 flex gap-4 items-center border border-gray-200 animate-fade-in">
               {/* YouTube Music */}
-              <button onClick={() => { window.open(getYoutubeMusicUrl(), '_blank'); setShowPlatformPopup(false); }} className="flex flex-col items-center group focus:outline-none">
-                <img src="/youtube_music.png" alt="YouTube Music" className="w-10 h-10 object-contain rounded-[10px] mb-1 group-hover:scale-110 group-hover:shadow-lg transition" />
-                <span className="text-xs text-white">YouTube Music</span>
+              <button onClick={() => { window.open(getYoutubeMusicUrl(), '_blank'); setShowPlatformPopup(false); }} className="w-14 h-14 p-1 flex items-center justify-center rounded-[10px] focus:outline-none">
+                <img src="/youtube_music.png" alt="YouTube Music" className="w-full h-full object-contain max-w-full max-h-full" />
               </button>
               {/* Apple Music */}
-              <button onClick={() => { window.open(getAppleMusicUrl(), '_blank'); setShowPlatformPopup(false); }} className="flex flex-col items-center group focus:outline-none">
-                <img src="/apple_music.png" alt="Apple Music" className="w-10 h-10 object-contain rounded-[10px] mb-1 group-hover:scale-110 group-hover:shadow-lg transition" />
-                <span className="text-xs text-white">Apple Music</span>
+              <button onClick={() => { window.open(getAppleMusicUrl(), '_blank'); setShowPlatformPopup(false); }} className="w-14 h-14 p-1 flex items-center justify-center rounded-[10px] focus:outline-none">
+                <img src="/apple_music.png" alt="Apple Music" className="w-full h-full object-contain max-w-full max-h-full" />
               </button>
               {/* Melon */}
-              <button onClick={() => { window.open(getMelonUrl(), '_blank'); setShowPlatformPopup(false); }} className="flex flex-col items-center group focus:outline-none">
-                <img src="/melon.png" alt="Melon" className="w-10 h-10 object-contain rounded-[10px] mb-1 group-hover:scale-110 group-hover:shadow-lg transition" />
-                <span className="text-xs text-white">Melon</span>
+              <button onClick={() => { window.open(getMelonUrl(), '_blank'); setShowPlatformPopup(false); }} className="w-14 h-14 p-1 flex items-center justify-center rounded-[10px] focus:outline-none">
+                <img src="/melon.png" alt="Melon" className="w-full h-full object-contain max-w-full max-h-full" />
               </button>
               {/* Vibe */}
-              <button onClick={() => { window.open(getVibeUrl(), '_blank'); setShowPlatformPopup(false); }} className="flex flex-col items-center group focus:outline-none">
-                <img src="/vibe.png" alt="Vibe" className="w-10 h-10 object-contain rounded-[10px] mb-1 group-hover:scale-110 group-hover:shadow-lg transition" />
-                <span className="text-xs text-white">Vibe</span>
+              <button onClick={() => { window.open(getVibeUrl(), '_blank'); setShowPlatformPopup(false); }} className="w-14 h-14 p-1 flex items-center justify-center rounded-[10px] focus:outline-none">
+                <img src="/vibe.png" alt="Vibe" className="w-full h-full object-contain max-w-full max-h-full" />
               </button>
             </div>
           )}
