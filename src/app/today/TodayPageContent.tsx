@@ -180,7 +180,7 @@ export default function TodayPageContent() {
         <div className="mb-4 text-[#A033FF]">오늘의 추천곡이에요 🎧</div>
         <div className="flex gap-4 mb-2 relative">
           <button
-            className="px-4 py-2 rounded-full bg-white/60 hover:bg-white/80 shadow border border-[#FF0000] flex items-center justify-center"
+            className="w-14 h-14 rounded-[10px] bg-white/60 hover:bg-white/80 shadow border border-[#FF0000] flex items-center justify-center"
             onClick={() => setShowPlatformPopup(v => !v)}
             aria-label="음원 플랫폼에서 검색"
             type="button"
@@ -188,18 +188,18 @@ export default function TodayPageContent() {
             <img 
               src="/youtube_music.png" 
               alt="YouTube Music" 
-              className="w-6 h-6"
+              className="w-6 h-6 object-contain" 
             />
           </button>
           <button
-            className="text-2xl px-4 py-2 rounded-full bg-white/60 hover:bg-white/80 shadow border border-[#FF2A68] text-[#FF2A68]"
+            className="w-14 h-14 rounded-[10px] text-2xl flex items-center justify-center bg-white/60 hover:bg-white/80 shadow border border-[#FF2A68] text-[#FF2A68]"
             onClick={likeSong}
             aria-label="좋아요"
           >
             ❤️
           </button>
           <button
-            className="text-2xl px-4 py-2 rounded-full bg-white/60 hover:bg-white/80 shadow border border-[#0B63F6] text-[#0B63F6]"
+            className="w-14 h-14 rounded-[10px] text-2xl flex items-center justify-center bg-white/60 hover:bg-white/80 shadow border border-[#0B63F6] text-[#0B63F6]"
             onClick={shareSong}
             aria-label="공유"
           >
@@ -207,26 +207,26 @@ export default function TodayPageContent() {
           </button>
           {/* 플랫폼 선택 팝업 */}
           {showPlatformPopup && (
-            <div ref={popupRef} className="absolute left-0 top-12 z-50 bg-white/90 rounded-xl shadow-lg px-6 py-4 flex gap-6 items-center border border-gray-200 animate-fade-in">
+            <div ref={popupRef} className="absolute left-0 top-12 z-50 w-[340px] bg-[#A033FF]/90 rounded-xl shadow-lg px-8 py-4 flex gap-6 items-center border border-gray-200 animate-fade-in">
               {/* YouTube Music */}
               <button onClick={() => { window.open(getYoutubeMusicUrl(), '_blank'); setShowPlatformPopup(false); }} className="flex flex-col items-center group focus:outline-none">
-                <img src="/youtube_music.png" alt="YouTube Music" className="w-10 h-10 mb-1 group-hover:scale-110 group-hover:shadow-lg transition" />
-                <span className="text-xs text-gray-700">YouTube Music</span>
+                <img src="/youtube_music.png" alt="YouTube Music" className="w-10 h-10 object-contain rounded-[10px] mb-1 group-hover:scale-110 group-hover:shadow-lg transition" />
+                <span className="text-xs text-white">YouTube Music</span>
               </button>
               {/* Apple Music */}
               <button onClick={() => { window.open(getAppleMusicUrl(), '_blank'); setShowPlatformPopup(false); }} className="flex flex-col items-center group focus:outline-none">
-                <img src="/apple_music.png" alt="Apple Music" className="w-10 h-10 mb-1 group-hover:scale-110 group-hover:shadow-lg transition" />
-                <span className="text-xs text-gray-700">Apple Music</span>
+                <img src="/apple_music.png" alt="Apple Music" className="w-10 h-10 object-contain rounded-[10px] mb-1 group-hover:scale-110 group-hover:shadow-lg transition" />
+                <span className="text-xs text-white">Apple Music</span>
               </button>
               {/* Melon */}
               <button onClick={() => { window.open(getMelonUrl(), '_blank'); setShowPlatformPopup(false); }} className="flex flex-col items-center group focus:outline-none">
-                <img src="/melon.png" alt="Melon" className="w-10 h-10 mb-1 group-hover:scale-110 group-hover:shadow-lg transition" />
-                <span className="text-xs text-gray-700">Melon</span>
+                <img src="/melon.png" alt="Melon" className="w-10 h-10 object-contain rounded-[10px] mb-1 group-hover:scale-110 group-hover:shadow-lg transition" />
+                <span className="text-xs text-white">Melon</span>
               </button>
               {/* Vibe */}
               <button onClick={() => { window.open(getVibeUrl(), '_blank'); setShowPlatformPopup(false); }} className="flex flex-col items-center group focus:outline-none">
-                <img src="/vibe.png" alt="Vibe" className="w-10 h-10 mb-1 group-hover:scale-110 group-hover:shadow-lg transition" />
-                <span className="text-xs text-gray-700">Vibe</span>
+                <img src="/vibe.png" alt="Vibe" className="w-10 h-10 object-contain rounded-[10px] mb-1 group-hover:scale-110 group-hover:shadow-lg transition" />
+                <span className="text-xs text-white">Vibe</span>
               </button>
             </div>
           )}
