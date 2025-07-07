@@ -1,5 +1,5 @@
 "use client";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -34,6 +34,7 @@ export default function TodayPageContent() {
   const link = searchParams.get("link");
   const [toast, setToast] = useState("");
   const recommendCount = getRecommendationCount();
+  const router = useRouter();
 
   if (!title || !artist || !link) {
     return (
@@ -79,8 +80,49 @@ export default function TodayPageContent() {
     setTimeout(() => setToast(""), 1500);
   };
 
+  // 곡 추천 버튼 동작 (홈과 동일)
+  const fetchSongAndRedirect = async () => {
+    try {
+      const res = await fetch("https://api.sheetbest.com/sheets/88c2b9c7-8d30-462b-ae7c-a4859aaf6955");
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      let songs = await res.json();
+      if (songs.length === 0) throw new Error("곡 데이터가 없습니다");
+      const recommendedLinks = JSON.parse(localStorage.getItem("todayRecommendedSongs") || "[]");
+      songs = songs.filter((song: any) => !recommendedLinks.includes(song["링크"]));
+      if (songs.length === 0) {
+        setToast("더 이상 추천할 곡이 없습니다!");
+        setTimeout(() => setToast(""), 3000);
+        return;
+      }
+      const random = songs[Math.floor(Math.random() * songs.length)];
+      localStorage.setItem("todaySong", JSON.stringify(random));
+      // 카운트 증가
+      const count = getRecommendationCount() + 1;
+      localStorage.setItem("recommendationCount", count.toString());
+      // 추천곡 중복 관리
+      recommendedLinks.push(random["링크"]);
+      localStorage.setItem("todayRecommendedSongs", JSON.stringify(recommendedLinks));
+      // /today로 이동
+      router.push(`/today?title=${encodeURIComponent(random["곡 제목"])}&artist=${encodeURIComponent(random["아티스트"])}&link=${encodeURIComponent(random["링크"])}${searchParams.get("login") ? '&login=1' : ''}`);
+    } catch (error) {
+      setToast("곡을 불러오는 중 오류가 발생했습니다");
+      setTimeout(() => setToast(""), 3000);
+    }
+  };
+
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#FF2A68] via-[#A033FF] to-[#0B63F6] px-4">
+      <div className="text-center mb-8">
+        <div className="text-lg text-white/90 mb-2">들어볼래?</div>
+        <div className="text-5xl font-bold text-white drop-shadow">한 곡 Indie</div>
+      </div>
+      <button
+        className={`w-48 h-14 bg-white/20 hover:bg-white/30 text-white rounded-full shadow-lg transition mb-8 flex items-center justify-center text-lg border-2 border-white/40 backdrop-blur font-semibold`}
+        onClick={fetchSongAndRedirect}
+        aria-label="오늘의 인디 한 곡 추천받기"
+      >
+        오늘의 곡 추천 받기
+      </button>
       <div className="flex items-center justify-center mb-4">
         <LpIcon />
         <span className="text-2xl font-bold text-white">{recommendCount}/{MAX_RECOMMENDATION_PER_DAY}</span>
