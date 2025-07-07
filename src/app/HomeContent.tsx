@@ -235,6 +235,13 @@ export default function HomeContent() {
       <div className="mb-4 text-white/90 text-base text-center font-medium">
         하루에 10곡의 음악을 추천 받을 수 있어요
       </div>
+      {recommendCount > 0 && (
+        <Link href="/today/songs" className="w-full flex justify-center mb-4">
+          <button className="w-full max-w-xs bg-[#A033FF] text-white rounded-full px-6 py-3 shadow-md hover:bg-[#7c25c9] transition text-base font-semibold">
+            오늘 추천 받은 곡 보기
+          </button>
+        </Link>
+      )}
       {toast && (
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-black text-white px-4 py-2 rounded shadow-lg text-sm z-50 animate-fade-in">
           {toast}

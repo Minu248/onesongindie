@@ -1,0 +1,73 @@
+"use client";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+
+interface Song {
+  "곡 제목": string;
+  "아티스트": string;
+  "링크": string;
+}
+
+export default function TodaySongsPage() {
+  const [songs, setSongs] = useState<Song[]>([]);
+
+  useEffect(() => {
+    const todaySongs = JSON.parse(localStorage.getItem("todayRecommendedSongs") || "[]");
+    // todaySongs는 링크 배열이므로, todaySong 객체도 불러와서 중복 없이 리스트 생성
+    const songObjs: Song[] = [];
+    todaySongs.forEach((link: string) => {
+      // localStorage에 저장된 todaySong 객체들 중 해당 링크와 일치하는 곡을 찾아 추가
+      // (실제 추천 시 todaySong을 덮어쓰므로, 링크만 저장된 경우가 많음)
+      // 여기서는 likedSongs, todaySong 등에서 최대한 정보 복원
+      const liked = JSON.parse(localStorage.getItem("likedSongs") || "[]");
+      const found = liked.find((s: Song) => s["링크"] === link);
+      if (found) songObjs.push(found);
+      else {
+        // todaySong에 있는 경우
+        const todaySong = localStorage.getItem("todaySong");
+        if (todaySong) {
+          const obj = JSON.parse(todaySong);
+          if (obj["링크"] === link) songObjs.push(obj);
+        }
+      }
+    });
+    // 중복 제거
+    const unique = songObjs.filter((v, i, arr) => arr.findIndex(s => s["링크"] === v["링크"]) === i);
+    setSongs(unique);
+  }, []);
+
+  return (
+    <main className="min-h-screen flex flex-col items-center bg-gradient-to-b from-[#FF2A68] via-[#A033FF] to-[#0B63F6] px-4 py-8">
+      <h1 className="text-2xl font-bold mb-6 text-center text-white drop-shadow">오늘 추천 받은 곡</h1>
+      {songs.length === 0 ? (
+        <div className="text-white/80 mb-8">오늘 추천받은 곡이 없습니다.</div>
+      ) : (
+        <div className="w-full max-w-2xl flex flex-col gap-6">
+          {songs.map((song, idx) => (
+            <div key={idx} className="bg-white/80 rounded-xl shadow-lg p-5 flex flex-col items-center backdrop-blur-md overflow-hidden">
+              <div className="mb-1 text-lg font-semibold text-[#A033FF]">{song["곡 제목"]}</div>
+              <div className="mb-3 text-gray-700">{song["아티스트"]}</div>
+              {song["링크"] && song["링크"].includes("youtu") && (
+                <div className="w-full max-w-xl mx-auto aspect-[16/9] mb-2">
+                  <iframe
+                    className="w-full h-full rounded-lg"
+                    src={`https://www.youtube.com/embed/${getYoutubeId(song["링크"])}?autoplay=0`}
+                    title="YouTube video player"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+      <Link href="/" className="mt-8 text-[#A033FF] underline">홈으로 돌아가기</Link>
+    </main>
+  );
+}
+
+function getYoutubeId(url: string) {
+  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)?)([\w-]{11})/);
+  return match ? match[1] : null;
+} 

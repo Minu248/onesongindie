@@ -186,6 +186,11 @@ export default function TodayPageContent() {
           내 플레이리스트 보기
         </Link>
         <div className="w-full flex flex-col gap-4 mt-6">
+          <Link href="/today/songs" className="w-full flex justify-center">
+            <button className="w-full bg-[#A033FF] text-white rounded-full px-6 py-3 shadow-md hover:bg-[#7c25c9] transition text-base font-semibold">
+              오늘 추천 받은 곡 보기
+            </button>
+          </Link>
           <a
             href="https://forms.gle/zQTC3ab4sgzJEPEY6"
             target="_blank"
