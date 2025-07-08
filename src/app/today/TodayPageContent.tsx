@@ -78,19 +78,19 @@ export default function TodayPageContent() {
     setTimeout(() => setToast(""), 1500);
   };
 
-  // 플랫폼별 검색 URL 생성
-  const getSearchQuery = () => `${title} ${artist}`;
-  const getYoutubeMusicUrl = () => `https://music.youtube.com/search?q=${encodeURIComponent(getSearchQuery())}&utm_source=onesongindie.com&utm_medium=button&utm_campaign=music_search`;
-  const getAppleMusicUrl = () => `https://music.apple.com/kr/search?term=${encodeURIComponent(getSearchQuery())}&utm_source=onesongindie.com&utm_medium=button&utm_campaign=music_search`;
-  const getMelonUrl = (query: string) => {
-    if (typeof navigator === 'undefined') return '';
-    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-      return `https://search.melon.com/search/searchMcom.htm?s=${encodeURIComponent(query)}&kkoSpl=Y&kkoDpType=&mwkLogType=C`;
-    } else {
-      return `https://www.melon.com/search/total/index.htm?q=${encodeURIComponent(query)}&section=&mwkLogType=T`;
-    }
-  };
-  const getVibeUrl = () => `https://vibe.naver.com/search?query=${encodeURIComponent(getSearchQuery())}&utm_source=onesongindie.com&utm_medium=button&utm_campaign=music_search`;
+  // 플랫폼별 검색 URL 생성 함수
+  function getYouTubeMusicUrl(query: string) {
+    return `https://music.youtube.com/search?q=${encodeURIComponent(query)}&utm_source=onesongindie.com&utm_medium=wkdalsdn5656_gmail&utm_campaign=music_search`;
+  }
+  function getAppleMusicUrl(query: string) {
+    return `https://music.apple.com/kr/search?term=${encodeURIComponent(query)}&utm_source=onesongindie.com&utm_medium=wkdalsdn5656_gmail&utm_campaign=music_search`;
+  }
+  function getSpotifyUrl(query: string) {
+    return `https://open.spotify.com/search/results/${encodeURIComponent(query)}?utm_source=onesongindie.com&utm_medium=wkdalsdn5656_gmail&utm_campaign=music_search`;
+  }
+  function getVibeUrl(query: string) {
+    return `https://vibe.naver.com/search?query=${encodeURIComponent(query)}&utm_source=onesongindie.com&utm_medium=wkdalsdn5656_gmail&utm_campaign=music_search`;
+  }
 
   // 곡 추천 버튼 동작 (홈과 동일)
   const fetchSongAndRedirect = async () => {
@@ -166,15 +166,19 @@ export default function TodayPageContent() {
         {/* 플랫폼 아이콘 버튼 */}
         <div className="flex gap-3 justify-center mb-4">
           {/* YouTube Music */}
-          <button onClick={() => window.open(`https://music.youtube.com/search?q=${encodeURIComponent(title + ' ' + artist)}&utm_source=onesongindie.com&utm_medium=wkdalsdn5656_gamil&utm_campaign=music_search`, '_blank')} className="w-10 h-10 p-1 rounded-[10px] focus:outline-none">
+          <button onClick={() => window.open(getYouTubeMusicUrl(title + ' ' + artist), '_blank')} className="w-10 h-10 p-1 rounded-[10px] focus:outline-none">
             <img src="/youtube_music.png" alt="YouTube Music" className="w-full h-full object-contain rounded-[10px]" />
           </button>
           {/* Apple Music */}
-          <button onClick={() => window.open(`https://music.apple.com/kr/search?term=${encodeURIComponent(title + ' ' + artist)}&utm_source=onesongindie.com&utm_medium=wkdalsdn5656_gamil&utm_campaign=music_search`, '_blank')} className="w-10 h-10 p-1 rounded-[10px] focus:outline-none">
+          <button onClick={() => window.open(getAppleMusicUrl(title + ' ' + artist), '_blank')} className="w-10 h-10 p-1 rounded-[10px] focus:outline-none">
             <img src="/apple_music.png" alt="Apple Music" className="w-full h-full object-contain rounded-[10px]" />
           </button>
+          {/* Spotify */}
+          <button onClick={() => window.open(getSpotifyUrl(title + ' ' + artist), '_blank')} className="w-10 h-10 p-1 rounded-[10px] focus:outline-none">
+            <img src="/spotify.png" alt="Spotify" className="w-full h-full object-contain rounded-[10px]" />
+          </button>
           {/* Vibe */}
-          <button onClick={() => window.open(`https://vibe.naver.com/search?query=${encodeURIComponent(title + ' ' + artist)}&utm_source=onesongindie.com&utm_medium=wkdalsdn5656_gamil&utm_campaign=music_search`, '_blank')} className="w-10 h-10 p-1 rounded-[10px] focus:outline-none">
+          <button onClick={() => window.open(getVibeUrl(title + ' ' + artist), '_blank')} className="w-10 h-10 p-1 rounded-[10px] focus:outline-none">
             <img src="/vibe.png" alt="Vibe" className="w-full h-full object-contain rounded-[10px]" />
           </button>
         </div>
