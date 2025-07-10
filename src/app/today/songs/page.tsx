@@ -12,19 +12,26 @@ export default function TodaySongsPage() {
   const [songs, setSongs] = useState<Song[]>([]);
 
   useEffect(() => {
-    // 날짜 체크 및 초기화
-    const lastDate = localStorage.getItem("lastRecommendationDate");
-    const today = new Date().toDateString();
-    if (lastDate !== today) {
-      localStorage.setItem("lastRecommendationDate", today);
-      localStorage.setItem("todayRecommendedSongs", JSON.stringify([]));
-      setSongs([]);
-      return;
-    }
-    const todaySongs: Song[] = JSON.parse(localStorage.getItem("todayRecommendedSongs") || "[]");
-    // 중복 제거 (링크 기준)
-    const unique = todaySongs.filter((v, i, arr) => arr.findIndex(s => s["링크"] === v["링크"]) === i);
-    setSongs(unique);
+    // 날짜 체크 및 초기화 함수
+    const checkAndResetSongs = () => {
+      const lastDate = localStorage.getItem("lastRecommendationDate");
+      const today = new Date().toDateString();
+      if (lastDate !== today) {
+        localStorage.setItem("lastRecommendationDate", today);
+        localStorage.setItem("todayRecommendedSongs", JSON.stringify([]));
+        setSongs([]);
+        return;
+      }
+      const todaySongs: Song[] = JSON.parse(localStorage.getItem("todayRecommendedSongs") || "[]");
+      // 중복 제거 (링크 기준)
+      const unique = todaySongs.filter((v, i, arr) => arr.findIndex(s => s["링크"] === v["링크"]) === i);
+      setSongs(unique);
+    };
+
+    checkAndResetSongs();
+    // 1분마다 날짜 체크
+    const interval = setInterval(checkAndResetSongs, 60 * 1000);
+    return () => clearInterval(interval);
   }, []);
 
   return (
