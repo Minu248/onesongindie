@@ -39,6 +39,7 @@ export default function TodayPageContent() {
 
   // 유튜브 ID 추출 함수
   const getYoutubeId = (url: string) => {
+    if (!url || typeof url !== 'string') return null;
     const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)?)([\w-]{11})/);
     return match ? match[1] : null;
   };
@@ -51,6 +52,7 @@ export default function TodayPageContent() {
 
   // 슬라이더에서 좋아요 버튼 클릭 시
   const likeSongFromSlider = (song: Song) => {
+    if (!song["링크"]) return;
     const liked = JSON.parse(localStorage.getItem("likedSongs") || "[]");
     if (!liked.find((s: any) => s["링크"] === song["링크"])) {
       liked.push(song);
@@ -62,6 +64,7 @@ export default function TodayPageContent() {
 
   // 슬라이더에서 공유 버튼 클릭 시
   const shareSongFromSlider = (song: Song) => {
+    if (!song["곡 제목"] || !song["아티스트"] || !song["링크"]) return;
     const url = window.location.origin + `/today?title=${encodeURIComponent(song["곡 제목"])}&artist=${encodeURIComponent(song["아티스트"])}&link=${encodeURIComponent(song["링크"])}`;
     navigator.clipboard.writeText(url);
     setToast("링크가 복사되었어요!");
@@ -196,36 +199,48 @@ export default function TodayPageContent() {
               ref={(el) => { if (el) slidesRef.current[index] = el; }}
               className="slide bg-white/80 backdrop-blur-md rounded-xl shadow-lg p-6 flex flex-col items-center"
             >
-              <div className="text-lg font-semibold text-[#A033FF] mb-2">{song["곡 제목"]}</div>
-              <div className="text-gray-700 mb-4">{song["아티스트"]}</div>
+              <div className="text-lg font-semibold text-[#A033FF] mb-2">{song["곡 제목"] || "제목 없음"}</div>
+              <div className="text-gray-700 mb-4">{song["아티스트"] || "아티스트 없음"}</div>
               <div className="w-full aspect-[16/9] mb-4">
                 {index === currentIndex ? (
-                  <iframe
-                    className="w-full h-full rounded-lg"
-                    src={`https://www.youtube.com/embed/${getYoutubeId(song["링크"])}?autoplay=1&mute=0&controls=1`}
-                    title="YouTube video player"
-                    allow="autoplay; encrypted-media"
-                    allowFullScreen
-                  />
+                  getYoutubeId(song["링크"]) ? (
+                    <iframe
+                      className="w-full h-full rounded-lg"
+                      src={`https://www.youtube.com/embed/${getYoutubeId(song["링크"])}?autoplay=1&mute=0&controls=1`}
+                      title="YouTube video player"
+                      allow="autoplay; encrypted-media"
+                      allowFullScreen
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center">
+                      <span className="text-gray-500">동영상을 불러올 수 없습니다</span>
+                    </div>
+                  )
                 ) : (
-                  <img 
-                    src={`https://img.youtube.com/vi/${getYoutubeId(song["링크"])}/hqdefault.jpg`} 
-                    alt={`${song["곡 제목"]} 썸네일`} 
-                    className="w-full h-full object-cover rounded-lg"
-                  />
+                  getYoutubeId(song["링크"]) ? (
+                    <img 
+                      src={`https://img.youtube.com/vi/${getYoutubeId(song["링크"])}/hqdefault.jpg`} 
+                      alt={`${song["곡 제목"]} 썸네일`} 
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center">
+                      <span className="text-gray-500">썸네일을 불러올 수 없습니다</span>
+                    </div>
+                  )
                 )}
               </div>
               <div className="flex gap-3 justify-center mb-4">
-                <button onClick={() => window.open(getYouTubeMusicUrl(song["곡 제목"] + ' ' + song["아티스트"]), '_blank')} className="w-10 h-10 p-1 rounded-[10px] focus:outline-none">
+                <button onClick={() => window.open(getYouTubeMusicUrl((song["곡 제목"] || "") + ' ' + (song["아티스트"] || "")), '_blank')} className="w-10 h-10 p-1 rounded-[10px] focus:outline-none">
                   <img src="/youtube_music.png" alt="YouTube Music" className="w-full h-full object-contain rounded-[10px]" />
                 </button>
-                <button onClick={() => window.open(getAppleMusicUrl(song["곡 제목"] + ' ' + song["아티스트"]), '_blank')} className="w-10 h-10 p-1 rounded-[10px] focus:outline-none">
+                <button onClick={() => window.open(getAppleMusicUrl((song["곡 제목"] || "") + ' ' + (song["아티스트"] || "")), '_blank')} className="w-10 h-10 p-1 rounded-[10px] focus:outline-none">
                   <img src="/apple_music.png" alt="Apple Music" className="w-full h-full object-contain rounded-[10px]" />
                 </button>
-                <button onClick={() => window.open(getSpotifyUrl(song["곡 제목"] + ' ' + song["아티스트"]), '_blank')} className="w-10 h-10 p-1 rounded-[10px] focus:outline-none">
+                <button onClick={() => window.open(getSpotifyUrl((song["곡 제목"] || "") + ' ' + (song["아티스트"] || "")), '_blank')} className="w-10 h-10 p-1 rounded-[10px] focus:outline-none">
                   <img src="/spotify.png" alt="Spotify" className="w-full h-full object-contain rounded-[10px]" />
                 </button>
-                <button onClick={() => window.open(getVibeUrl(song["곡 제목"] + ' ' + song["아티스트"]), '_blank')} className="w-10 h-10 p-1 rounded-[10px] focus:outline-none">
+                <button onClick={() => window.open(getVibeUrl((song["곡 제목"] || "") + ' ' + (song["아티스트"] || "")), '_blank')} className="w-10 h-10 p-1 rounded-[10px] focus:outline-none">
                   <img src="/vibe.png" alt="Vibe" className="w-full h-full object-contain rounded-[10px]" />
                 </button>
               </div>
