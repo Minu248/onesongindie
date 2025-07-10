@@ -72,24 +72,26 @@ export default function TodayPageContent() {
   };
 
   useEffect(() => {
-    // localStorage에서 오늘 추천받은 곡 목록 불러오기
-    const songs: Song[] = JSON.parse(typeof window !== 'undefined' ? (localStorage.getItem("todayRecommendedSongs") || "[]") : "[]");
-    setRecommendedSongs(songs);
-    // 추천 카운트도 localStorage에서 불러오기
+    if (typeof window === 'undefined') return;
+    
     const getTodayString = () => new Date().toDateString();
-    const getRecommendationCount = () => {
-      const lastDate = typeof window !== 'undefined' ? localStorage.getItem("lastRecommendationDate") : null;
-      const today = getTodayString();
-      if (lastDate !== today) {
-        if (typeof window !== 'undefined') {
-          localStorage.setItem("lastRecommendationDate", today);
-          localStorage.setItem("recommendationCount", "0");
-        }
-        return 0;
-      }
-      return typeof window !== 'undefined' ? parseInt(localStorage.getItem("recommendationCount") || "0", 10) : 0;
-    };
-    setRecommendCount(getRecommendationCount());
+    const today = getTodayString();
+    const lastDate = localStorage.getItem("lastRecommendationDate");
+    
+    // 날짜가 바뀌었으면 모든 데이터 초기화
+    if (lastDate !== today) {
+      localStorage.setItem("lastRecommendationDate", today);
+      localStorage.setItem("recommendationCount", "0");
+      localStorage.setItem("todayRecommendedSongs", "[]"); // 추천 곡 목록 초기화
+      setRecommendedSongs([]);
+      setRecommendCount(0);
+    } else {
+      // 같은 날이면 기존 데이터 불러오기
+      const songs: Song[] = JSON.parse(localStorage.getItem("todayRecommendedSongs") || "[]");
+      const count = parseInt(localStorage.getItem("recommendationCount") || "0", 10);
+      setRecommendedSongs(songs);
+      setRecommendCount(count);
+    }
   }, []);
 
   // 3D 커버플로우 슬라이더 컴포넌트
@@ -138,8 +140,16 @@ export default function TodayPageContent() {
       setTouchEnd(e.targetTouches[0].clientX);
     };
     const handleTouchEnd = () => {
-      if (touchStart - touchEnd > 100) nextSlide();
-      if (touchStart - touchEnd < -100) prevSlide();
+      const swipeDistance = Math.abs(touchStart - touchEnd);
+      const minSwipeDistance = 50; // 100px에서 50px로 민감도 향상
+      
+      if (swipeDistance >= minSwipeDistance) {
+        if (touchStart - touchEnd > 0) {
+          nextSlide(); // 오른쪽에서 왼쪽으로 스와이프 (다음 슬라이드)
+        } else {
+          prevSlide(); // 왼쪽에서 오른쪽으로 스와이프 (이전 슬라이드)
+        }
+      }
     };
     const handleMouseDown = (e: React.MouseEvent) => {
       setIsDragging(true);
@@ -151,8 +161,15 @@ export default function TodayPageContent() {
     const handleMouseUp = (e: React.MouseEvent) => {
       if (!isDragging) return;
       const dragDistance = e.clientX - dragStartX;
-      if (dragDistance < -100) nextSlide();
-      else if (dragDistance > 100) prevSlide();
+      const minDragDistance = 50; // 100px에서 50px로 민감도 향상
+      
+      if (Math.abs(dragDistance) >= minDragDistance) {
+        if (dragDistance < 0) {
+          nextSlide(); // 오른쪽에서 왼쪽으로 드래그 (다음 슬라이드)
+        } else {
+          prevSlide(); // 왼쪽에서 오른쪽으로 드래그 (이전 슬라이드)
+        }
+      }
       setIsDragging(false);
     };
     const handleWheel = useCallback((e: WheelEvent) => {
