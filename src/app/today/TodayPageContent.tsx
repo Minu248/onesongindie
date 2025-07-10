@@ -199,13 +199,21 @@ export default function TodayPageContent() {
               <div className="text-lg font-semibold text-[#A033FF] mb-2">{song["곡 제목"]}</div>
               <div className="text-gray-700 mb-4">{song["아티스트"]}</div>
               <div className="w-full aspect-[16/9] mb-4">
-                <iframe
-                  className="w-full h-full rounded-lg"
-                  src={`https://www.youtube.com/embed/${getYoutubeId(song["링크"])}`}
-                  title="YouTube video player"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
+                {index === currentIndex ? (
+                  <iframe
+                    className="w-full h-full rounded-lg"
+                    src={`https://www.youtube.com/embed/${getYoutubeId(song["링크"])}?autoplay=1&mute=0&controls=1`}
+                    title="YouTube video player"
+                    allow="autoplay; encrypted-media"
+                    allowFullScreen
+                  />
+                ) : (
+                  <img 
+                    src={`https://img.youtube.com/vi/${getYoutubeId(song["링크"])}/hqdefault.jpg`} 
+                    alt={`${song["곡 제목"]} 썸네일`} 
+                    className="w-full h-full object-cover rounded-lg"
+                  />
+                )}
               </div>
               <div className="flex gap-3 justify-center mb-4">
                 <button onClick={() => window.open(getYouTubeMusicUrl(song["곡 제목"] + ' ' + song["아티스트"]), '_blank')} className="w-10 h-10 p-1 rounded-[10px] focus:outline-none">
@@ -263,7 +271,10 @@ export default function TodayPageContent() {
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-black text-white px-4 py-2 rounded shadow-lg text-sm z-50 animate-fade-in">{toast}</div>
       )}
       <style jsx global>{`
-        .slider-track { transform-style: preserve-3d; }
+        .slider-track { 
+          transform-style: preserve-3d; 
+          will-change: transform;
+        }
         .slide {
           position: absolute;
           top: 85%; left: 50%;
@@ -273,6 +284,7 @@ export default function TodayPageContent() {
           transform-origin: center center;
           backface-visibility: hidden;
           transition: transform 0.8s ease-in-out, filter 0.8s ease-in-out;
+          will-change: transform;
         }
         .song-detail-box {
           width: 100%;
