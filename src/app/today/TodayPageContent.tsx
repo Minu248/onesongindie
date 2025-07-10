@@ -34,7 +34,7 @@ interface Song {
 
 export default function TodayPageContent() {
   const [toast, setToast] = useState("");
-  const recommendCount = getRecommendationCount();
+  const [recommendCount, setRecommendCount] = useState(0);
   const [recommendedSongs, setRecommendedSongs] = useState<Song[]>([]);
 
   // 유튜브 ID 추출 함수
@@ -68,13 +68,25 @@ export default function TodayPageContent() {
     setTimeout(() => setToast(""), 1500);
   };
 
-  // 오늘 추천받은 곡 목록 불러오기
   useEffect(() => {
-    const loadRecommendedSongs = () => {
-      const songs: Song[] = JSON.parse(localStorage.getItem("todayRecommendedSongs") || "[]");
-      setRecommendedSongs(songs);
+    // localStorage에서 오늘 추천받은 곡 목록 불러오기
+    const songs: Song[] = JSON.parse(typeof window !== 'undefined' ? (localStorage.getItem("todayRecommendedSongs") || "[]") : "[]");
+    setRecommendedSongs(songs);
+    // 추천 카운트도 localStorage에서 불러오기
+    const getTodayString = () => new Date().toDateString();
+    const getRecommendationCount = () => {
+      const lastDate = typeof window !== 'undefined' ? localStorage.getItem("lastRecommendationDate") : null;
+      const today = getTodayString();
+      if (lastDate !== today) {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem("lastRecommendationDate", today);
+          localStorage.setItem("recommendationCount", "0");
+        }
+        return 0;
+      }
+      return typeof window !== 'undefined' ? parseInt(localStorage.getItem("recommendationCount") || "0", 10) : 0;
     };
-    loadRecommendedSongs();
+    setRecommendCount(getRecommendationCount());
   }, []);
 
   // 3D 커버플로우 슬라이더 컴포넌트
