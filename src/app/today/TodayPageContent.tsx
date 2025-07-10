@@ -247,7 +247,7 @@ export default function TodayPageContent() {
         </div>
         <button onClick={prevSlide} className="prev-btn absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-[#fc1eaf]/70 hover:bg-white text-white rounded-full w-12 h-12 flex items-center justify-center shadow transition md:block hidden" aria-label="이전 슬라이드">◀</button>
         <button onClick={nextSlide} className="next-btn absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-[#fc1eaf]/70 hover:bg-white text-white rounded-full w-12 h-12 flex items-center justify-center shadow transition md:block hidden" aria-label="다음 슬라이드">▶</button>
-        <div className="flex justify-center gap-2 absolute bottom-4 left-0 right-0">
+        <div className="flex justify-center gap-2 absolute bottom-26 md:bottom-12 left-0 right-0">
           {songs.map((_, idx) => (
             <button key={idx} onClick={() => setCurrentIndex(idx)} className={`w-3 h-3 rounded-full transition-all ${idx === currentIndex ? 'bg-white' : 'bg-white/30'}`} aria-label={`${idx + 1}번 슬라이드로 이동`} />
           ))}
@@ -258,12 +258,12 @@ export default function TodayPageContent() {
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#FF2A68] via-[#A033FF] to-[#0B63F6] px-4 overflow-x-hidden">
-      <div className="text-center mb-8">
+      <div className="text-center mb-4">
         <div className="text-lg text-white/90 mt-4 mb-2">들어볼래?</div>
-        <div className="text-5xl font-bold text-white drop-shadow">한 곡 Indie</div>
+        <div className="text-4xl font-bold text-white drop-shadow">한 곡 Indie</div>
       </div>
       <div className="mb-2 text-white/90 text-base text-center font-medium">당신의 하루를 바꿔줄 한국 인디 음악을 발견하세요</div>
-      <div className="mb-8 text-white/90 text-base text-center font-medium">하루에 한 번 10곡의 음악을 추천 받을 수 있어요</div>
+      <div className="mb-8 md:mb-2 text-white/90 text-base text-center font-medium">하루에 한 번 10곡의 음악을 추천 받을 수 있어요</div>
       <div className="w-full max-w-2xl mb-6 mt-10 md:mb-16 md:mt-32 relative h-[700px] z-20">
         <SongSlider />
       </div>
