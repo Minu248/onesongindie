@@ -243,24 +243,26 @@ export default function TodayPageContent() {
     useEffect(() => {
       if (!isYouTubeAPIReady) return;
 
-      // 모든 플레이어 정리
-      Object.keys(playersRef.current).forEach(key => {
-        const index = parseInt(key);
-        if (index !== currentIndex) {
-          destroyPlayer(index);
-        }
-      });
-
-      // 현재 슬라이드의 플레이어 생성
+      // 현재 슬라이드의 플레이어가 이미 있는지 확인
       const currentSong = songs[currentIndex];
       const videoId = getYoutubeId(currentSong["링크"]);
       
-      if (videoId) {
-        // 약간의 지연을 두어 DOM이 업데이트된 후 플레이어 생성
+      if (videoId && !playersRef.current[currentIndex]) {
+        // 현재 슬라이드에 플레이어가 없을 때만 생성
         setTimeout(() => {
           createYouTubePlayer(currentIndex, videoId);
         }, 100);
       }
+
+      // 다른 플레이어들은 지연 후 정리 (즉시 정리하지 않음)
+      setTimeout(() => {
+        Object.keys(playersRef.current).forEach(key => {
+          const index = parseInt(key);
+          if (index !== currentIndex) {
+            destroyPlayer(index);
+          }
+        });
+      }, 500); // 0.5초 후 정리
     }, [currentIndex, isYouTubeAPIReady, songs, createYouTubePlayer, destroyPlayer]);
 
     // 컴포넌트 언마운트 시 모든 플레이어 정리
@@ -273,18 +275,39 @@ export default function TodayPageContent() {
     }, [destroyPlayer]);
 
     // 터치/마우스/휠 이벤트 핸들러
+    const [touchStartY, setTouchStartY] = useState(0);
+    const [touchEndY, setTouchEndY] = useState(0);
+    
     const handleTouchStart = (e: React.TouchEvent) => {
       setTouchStart(e.targetTouches[0].clientX);
       setTouchEnd(e.targetTouches[0].clientX);
+      setTouchStartY(e.targetTouches[0].clientY);
+      setTouchEndY(e.targetTouches[0].clientY);
     };
     const handleTouchMove = (e: React.TouchEvent) => {
       setTouchEnd(e.targetTouches[0].clientX);
+      setTouchEndY(e.targetTouches[0].clientY);
+      
+      // 가로 스와이프가 감지되면 기본 스크롤 방지
+      const swipeDistanceX = Math.abs(e.targetTouches[0].clientX - touchStart);
+      const swipeDistanceY = Math.abs(e.targetTouches[0].clientY - touchStartY);
+      
+      if (swipeDistanceX > swipeDistanceY && swipeDistanceX > 20) {
+        e.preventDefault();
+      }
     };
     const handleTouchEnd = () => {
-      const swipeDistance = Math.abs(touchStart - touchEnd);
-      const minSwipeDistance = 50; // 100px에서 50px로 민감도 향상
+      const swipeDistanceX = Math.abs(touchStart - touchEnd);
+      const swipeDistanceY = Math.abs(touchStartY - touchEndY);
+      const minSwipeDistance = 50;
       
-      if (swipeDistance >= minSwipeDistance) {
+      // 세로 스크롤이 가로 스와이프보다 크면 스와이프 무시
+      if (swipeDistanceY > swipeDistanceX) {
+        return;
+      }
+      
+      // 가로 스와이프만 처리
+      if (swipeDistanceX >= minSwipeDistance) {
         if (touchStart - touchEnd > 0) {
           nextSlide(); // 오른쪽에서 왼쪽으로 스와이프 (다음 슬라이드)
         } else {
@@ -314,7 +337,17 @@ export default function TodayPageContent() {
       setIsDragging(false);
     };
     const handleWheel = useCallback((e: WheelEvent) => {
-      const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+      // 모바일에서는 휠 이벤트 무시
+      if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        return;
+      }
+      
+      // 가로 스크롤만 처리 (세로 스크롤 무시)
+      if (Math.abs(e.deltaX) < Math.abs(e.deltaY)) {
+        return;
+      }
+      
+      const delta = e.deltaX;
       const sensitivity = 50;
       if (delta > sensitivity) nextSlide();
       else if (delta < -sensitivity) prevSlide();
