@@ -4,8 +4,9 @@ import HomeContent from './HomeContent';
 import { Suspense } from 'react';
 
 export async function generateMetadata({ searchParams }) {
-  const title = searchParams?.title;
-  const artist = searchParams?.artist;
+  const params = await searchParams;
+  const title = params?.title;
+  const artist = params?.artist;
   
   if (title && artist) {
     return {

@@ -27,7 +27,7 @@ interface Song {
 }
 
 // 하루에 최대 추천 횟수
-const MAX_RECOMMENDATION_PER_DAY = 10;
+const MAX_RECOMMENDATION_PER_DAY = 1; // 하루 최대 추천 횟수를 10에서 1로 변경
 
 const getTodayString = () => {
   return new Date().toDateString();
@@ -150,6 +150,8 @@ export default function HomeContent() {
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       let songs: Song[] = await res.json();
       if (songs.length === 0) throw new Error("곡 데이터가 없습니다");
+      
+      // 이미 추천된 곡 필터링
       if (!session) {
         const recommendedSongs = getTodayRecommendedSongs();
         songs = songs.filter(song => !recommendedSongs.find(s => s["링크"] === song["링크"]));
@@ -159,17 +161,46 @@ export default function HomeContent() {
           return;
         }
       }
-      const random = songs[Math.floor(Math.random() * songs.length)];
+      
+      // 랜덤으로 10개의 곡 선택 (또는 남은 곡이 10개 미만이면 모두 선택)
+      const randomSongs: Song[] = [];
+      const tempSongs = [...songs]; // 원본 배열 복사
+      const selectionCount = Math.min(10, tempSongs.length);
+      
+      for (let i = 0; i < selectionCount; i++) {
+        const randomIndex = Math.floor(Math.random() * tempSongs.length);
+        randomSongs.push(tempSongs[randomIndex]);
+        tempSongs.splice(randomIndex, 1); // 선택된 곡은 제거하여 중복 방지
+      }
+      
+      // 첫 번째 곡을 현재 추천 곡으로 설정
+      const random = randomSongs[0];
       setStoredTodaySong(random);
+      
       if (!session) {
         incrementRecommendationCount();
-        addTodayRecommendedSong(random);
+        
+        // 10개의 곡을 모두 오늘의 추천 곡 목록에 추가
+        const existingRecommendedSongs = getTodayRecommendedSongs();
+        const newRecommendedSongs = [...existingRecommendedSongs];
+        
+        randomSongs.forEach(song => {
+          // 이미 추천 목록에 없는 곡만 추가
+          if (!newRecommendedSongs.find(s => s["링크"] === song["링크"])) {
+            newRecommendedSongs.push(song);
+          }
+        });
+        
+        // 업데이트된 추천 목록 저장
+        localStorage.setItem("todayRecommendedSongs", JSON.stringify(newRecommendedSongs));
         setRecommendCount(getRecommendationCount());
       }
+      
       setCanRecommend(session ? true : getRecommendationCount() < MAX_RECOMMENDATION_PER_DAY);
       setIsSharedMode(false);
+      
       // 곡 정보 쿼리 파라미터로 /today로 이동
-      router.push(`/today?title=${encodeURIComponent(random["곡 제목"])}&artist=${encodeURIComponent(random["아티스트"])}&link=${encodeURIComponent(random["링크"])}${session ? '&login=1' : ''}`);
+      router.push(`/today`);
     } catch (error) {
       console.error("fetchSong 에러:", error);
       setToast("곡을 불러오는 중 오류가 발생했습니다");
@@ -179,7 +210,7 @@ export default function HomeContent() {
 
   const handleRecommendClick = () => {
     if (!session && !canRecommend) {
-      setToast(`오늘은 최대 ${MAX_RECOMMENDATION_PER_DAY}번까지 추천받을 수 있어요! 내일 다시 와주세요 😊`);
+      setToast(`오늘은 이미 추천을 받았어요! 내일 다시 와주세요 😊`);
       setTimeout(() => setToast(""), 3000);
       return;
     }
@@ -236,10 +267,10 @@ export default function HomeContent() {
         당신의 하루를 바꿔줄 한국 인디 음악을 발견하세요
       </div>
       <div className="mb-4 text-white/90 text-base text-center font-medium">
-        하루에 10곡의 음악을 추천 받을 수 있어요
+        하루에 한 번 10곡의 음악을 추천 받을 수 있어요
       </div>
       {recommendCount > 0 && (
-        <Link href="/today/songs" className="w-full flex justify-center mb-4">
+        <Link href="/today" className="w-full flex justify-center mb-4">
           <button className="w-full max-w-xs bg-[#A033FF] text-white rounded-full px-6 py-3 shadow-md hover:bg-[#7c25c9] transition text-base font-semibold">
             오늘 추천 받은 곡 보기
           </button>
