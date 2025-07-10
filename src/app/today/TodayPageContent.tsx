@@ -2,6 +2,14 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
+// YouTube IFrame API 타입 정의
+declare global {
+  interface Window {
+    YT: any;
+    onYouTubeIframeAPIReady: () => void;
+  }
+}
+
 // LP 아이콘 컴포넌트
 const LpIcon = () => (
   <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="mr-2">
@@ -36,6 +44,33 @@ export default function TodayPageContent() {
   const [toast, setToast] = useState("");
   const [recommendCount, setRecommendCount] = useState(0);
   const [recommendedSongs, setRecommendedSongs] = useState<Song[]>([]);
+  const [isYouTubeAPIReady, setIsYouTubeAPIReady] = useState(false);
+
+  // YouTube IFrame API 로드
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    // 이미 로드된 경우
+    if (window.YT && window.YT.Player) {
+      setIsYouTubeAPIReady(true);
+      return;
+    }
+    
+    // API 스크립트 로드
+    const script = document.createElement('script');
+    script.src = 'https://www.youtube.com/iframe_api';
+    script.async = true;
+    document.head.appendChild(script);
+    
+    // API 준비 완료 콜백
+    window.onYouTubeIframeAPIReady = () => {
+      setIsYouTubeAPIReady(true);
+    };
+    
+    return () => {
+      document.head.removeChild(script);
+    };
+  }, []);
 
   // 유튜브 ID 추출 함수
   const getYoutubeId = (url: string) => {
@@ -103,6 +138,8 @@ export default function TodayPageContent() {
     const [touchEnd, setTouchEnd] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
     const [dragStartX, setDragStartX] = useState(0);
+    const playersRef = useRef<{[key: number]: any}>({});
+    const playerContainerRefs = useRef<{[key: number]: HTMLDivElement | null}>({});
 
     const songs = recommendedSongs.length > 0 ? recommendedSongs : Array(10).fill({
       "곡 제목": "예시 곡 제목",
@@ -130,6 +167,110 @@ export default function TodayPageContent() {
       const len = songs.length;
       setCurrentIndex((prev) => (prev + 1) % len);
     };
+
+    // YouTube 플레이어 생성 함수
+    const createYouTubePlayer = useCallback((index: number, videoId: string) => {
+      if (!isYouTubeAPIReady || !window.YT || !playerContainerRefs.current[index]) return;
+      
+      // 기존 플레이어가 있다면 제거
+      if (playersRef.current[index]) {
+        try {
+          playersRef.current[index].destroy();
+        } catch (e) {
+          console.warn('플레이어 제거 중 오류:', e);
+        }
+      }
+
+      const containerId = `youtube-player-${index}`;
+      const container = playerContainerRefs.current[index];
+      if (!container) return;
+
+      // 컨테이너 내용 초기화
+      container.innerHTML = `<div id="${containerId}"></div>`;
+
+      try {
+        playersRef.current[index] = new window.YT.Player(containerId, {
+          videoId: videoId,
+          width: '100%',
+          height: '100%',
+          playerVars: {
+            autoplay: 1,
+            mute: 0,
+            controls: 1,
+            rel: 0,
+            modestbranding: 1,
+            fs: 1,
+            cc_load_policy: 0,
+            iv_load_policy: 3,
+            autohide: 0
+          },
+          events: {
+            onReady: (event: any) => {
+              console.log(`플레이어 ${index} 준비 완료`);
+            },
+            onStateChange: (event: any) => {
+              // 재생 종료 시 (0 = ended)
+              if (event.data === 0) {
+                console.log(`곡 ${index} 재생 종료, 다음 곡으로 이동`);
+                setTimeout(() => {
+                  nextSlide();
+                }, 1000); // 1초 후 다음 슬라이드로 이동
+              }
+            },
+            onError: (event: any) => {
+              console.error(`플레이어 ${index} 오류:`, event.data);
+            }
+          }
+        });
+      } catch (error) {
+        console.error('YouTube 플레이어 생성 오류:', error);
+      }
+    }, [isYouTubeAPIReady, nextSlide]);
+
+    // 플레이어 정리 함수
+    const destroyPlayer = useCallback((index: number) => {
+      if (playersRef.current[index]) {
+        try {
+          playersRef.current[index].destroy();
+          delete playersRef.current[index];
+        } catch (e) {
+          console.warn('플레이어 제거 중 오류:', e);
+        }
+      }
+    }, []);
+
+    // 현재 슬라이드 변경 시 플레이어 관리
+    useEffect(() => {
+      if (!isYouTubeAPIReady) return;
+
+      // 모든 플레이어 정리
+      Object.keys(playersRef.current).forEach(key => {
+        const index = parseInt(key);
+        if (index !== currentIndex) {
+          destroyPlayer(index);
+        }
+      });
+
+      // 현재 슬라이드의 플레이어 생성
+      const currentSong = songs[currentIndex];
+      const videoId = getYoutubeId(currentSong["링크"]);
+      
+      if (videoId) {
+        // 약간의 지연을 두어 DOM이 업데이트된 후 플레이어 생성
+        setTimeout(() => {
+          createYouTubePlayer(currentIndex, videoId);
+        }, 100);
+      }
+    }, [currentIndex, isYouTubeAPIReady, songs, createYouTubePlayer, destroyPlayer]);
+
+    // 컴포넌트 언마운트 시 모든 플레이어 정리
+    useEffect(() => {
+      return () => {
+        Object.keys(playersRef.current).forEach(key => {
+          destroyPlayer(parseInt(key));
+        });
+      };
+    }, [destroyPlayer]);
 
     // 터치/마우스/휠 이벤트 핸들러
     const handleTouchStart = (e: React.TouchEvent) => {
@@ -221,12 +362,9 @@ export default function TodayPageContent() {
               <div className="w-full aspect-[16/9] mb-4">
                 {index === currentIndex ? (
                   getYoutubeId(song["링크"]) ? (
-                    <iframe
-                      className="w-full h-full rounded-lg"
-                      src={`https://www.youtube.com/embed/${getYoutubeId(song["링크"])}?autoplay=1&mute=0&controls=1`}
-                      title="YouTube video player"
-                      allow="autoplay; encrypted-media"
-                      allowFullScreen
+                    <div 
+                      ref={(el) => { playerContainerRefs.current[index] = el; }}
+                      className="w-full h-full rounded-lg overflow-hidden"
                     />
                   ) : (
                     <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center">
