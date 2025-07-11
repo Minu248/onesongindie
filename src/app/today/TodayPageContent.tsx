@@ -110,7 +110,7 @@ export default function TodayPageContent() {
   // 슬라이더에서 공유 버튼 클릭 시
   const shareSongFromSlider = (song: Song) => {
     if (!song["곡 제목"] || !song["아티스트"] || !song["링크"]) return;
-    const url = window.location.origin + `/today?title=${encodeURIComponent(song["곡 제목"])}&artist=${encodeURIComponent(song["아티스트"])}&link=${encodeURIComponent(song["링크"])}`;
+    const url = window.location.origin + `/shared?title=${encodeURIComponent(song["곡 제목"])}&artist=${encodeURIComponent(song["아티스트"])}&link=${encodeURIComponent(song["링크"])}`;
     navigator.clipboard.writeText(url);
     setToast("링크가 복사되었어요!");
     setTimeout(() => setToast(""), 1500);

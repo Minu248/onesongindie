@@ -15,11 +15,6 @@ const LpIcon = () => (
   </svg>
 );
 
-const getYoutubeId = (url: string) => {
-  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)?)([\w-]{11})/);
-  return match ? match[1] : null;
-};
-
 interface Song {
   "곡 제목": string;
   "아티스트": string;
@@ -27,7 +22,7 @@ interface Song {
 }
 
 // 하루에 최대 추천 횟수
-const MAX_RECOMMENDATION_PER_DAY = 1; // 하루 최대 추천 횟수를 10에서 1로 변경
+const MAX_RECOMMENDATION_PER_DAY = 1;
 
 const getTodayString = () => {
   return new Date().toDateString();
@@ -103,7 +98,6 @@ export default function HomeContent() {
   const searchParams = useSearchParams();
   const { data: session } = useSession();
   const router = useRouter();
-  const [song, setSong] = useState<Song | null>(null);
   const [toast, setToast] = useState("");
   const [isSharedMode, setIsSharedMode] = useState(false);
   const [canRecommend, setCanRecommend] = useState(true);
@@ -119,7 +113,6 @@ export default function HomeContent() {
       const count = getRecommendationCount();
       setRecommendCount(count);
       if (todaySong) {
-        setSong(todaySong);
         setCanRecommend(count < MAX_RECOMMENDATION_PER_DAY);
       } else {
         setCanRecommend(count < MAX_RECOMMENDATION_PER_DAY);
@@ -134,12 +127,6 @@ export default function HomeContent() {
     const link = searchParams.get("link");
     
     if (title && artist && link) {
-      const sharedSong = {
-        "곡 제목": title,
-        "아티스트": artist,
-        "링크": link,
-      };
-      setSong(sharedSong);
       setIsSharedMode(true);
     }
   }, [searchParams]);
@@ -217,34 +204,6 @@ export default function HomeContent() {
     fetchSongAndRedirect();
   };
 
-  const likeSong = () => {
-    if (!song) return;
-    const liked = JSON.parse(localStorage.getItem("likedSongs") || "[]");
-    if (!liked.find((s: Song) => s["링크"] === song["링크"])) {
-      liked.push(song);
-      localStorage.setItem("likedSongs", JSON.stringify(liked));
-    }
-    setToast("플레이리스트에 저장했어요!");
-    setTimeout(() => setToast(""), 1500);
-  };
-
-  const shareSong = () => {
-    if (!song) return;
-    const url = window.location.origin + `/?title=${encodeURIComponent(song["곡 제목"])}&artist=${encodeURIComponent(song["아티스트"])}&link=${encodeURIComponent(song["링크"])}`;
-    navigator.clipboard.writeText(url);
-    setToast("링크가 복사되었어요!");
-    setTimeout(() => setToast(""), 1500);
-  };
-
-  const openYouTubeMusic = () => {
-    if (!song) return;
-    const searchQuery = `${song["곡 제목"]} ${song["아티스트"]}`;
-    const youtubeMusicUrl = `https://music.youtube.com/search?q=${encodeURIComponent(searchQuery)}&utm_source=onesongindie.com&utm_medium=wkdalsdn5656_gmail`;
-    window.open(youtubeMusicUrl, '_blank');
-    setToast("YouTube Music에서 검색 중이에요!");
-    setTimeout(() => setToast(""), 1500);
-  };
-
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#FF2A68] via-[#A033FF] to-[#0B63F6] px-4">
       <div className="text-center mb-8">
@@ -259,14 +218,14 @@ export default function HomeContent() {
         {canRecommend ? '🎵' : '⏰'}
       </button>
       {/* 카운트 숫자 + LP판 아이콘 */}
-      <div className="flex items-center justify-center mb-4">
+      {/* <div className="flex items-center justify-center mb-4">
         {!session && <LpIcon />}
         {!session && <span className="text-2xl font-bold text-white">{recommendCount}/{MAX_RECOMMENDATION_PER_DAY}</span>}
-      </div>
-      <div className="mb-2 text-white/90 text-base text-center font-medium">
+      </div> */}
+      <div className="mt-1 mb-2 text-white/90 text-base text-center font-medium">
         당신의 하루를 바꿔줄 한국 인디 음악을 발견하세요
       </div>
-      <div className="mb-4 text-white/90 text-base text-center font-medium">
+      <div className="mb-6 text-white/90 text-base text-center font-medium">
         하루에 한 번 10곡의 음악을 추천 받을 수 있어요
       </div>
       {recommendCount > 0 && (
