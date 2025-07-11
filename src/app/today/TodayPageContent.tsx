@@ -1,6 +1,7 @@
 "use client";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { APP_VERSION } from "@/config/appVersion";
 
 // YouTube IFrame API 타입 정의
 declare global {
@@ -22,16 +23,63 @@ const LpIcon = () => (
 );
 
 const MAX_RECOMMENDATION_PER_DAY = 1;
+
 const getTodayString = () => new Date().toDateString();
-const getRecommendationCount = () => {
+
+// 통합된 초기화 함수 - 모든 관련 데이터를 완전히 초기화
+const resetAllTodayData = () => {
+  const today = getTodayString();
+  localStorage.setItem("lastRecommendationDate", today);
+  localStorage.setItem("recommendationCount", "0");
+  localStorage.setItem("todayRecommendedSongs", JSON.stringify([]));
+  localStorage.setItem("todaySong", ""); // 빈 문자열로 초기화
+  localStorage.setItem("appVersion", APP_VERSION); // 앱 버전 저장
+};
+
+// 앱 버전 체크를 통한 강제 초기화
+const forceResetIfNeeded = () => {
+  const storedVersion = localStorage.getItem("appVersion");
+  if (storedVersion !== APP_VERSION) {
+    console.log(`앱 버전이 업데이트되었습니다 (${storedVersion} -> ${APP_VERSION}). 데이터를 초기화합니다.`);
+    resetAllTodayData();
+    return true;
+  }
+  return false;
+};
+
+// 날짜 체크 및 필요시 초기화
+const checkAndResetIfNeeded = () => {
+  // 먼저 앱 버전 체크
+  const wasForceReset = forceResetIfNeeded();
+  if (wasForceReset) return true;
+  
+  // 날짜 체크
   const lastDate = localStorage.getItem("lastRecommendationDate");
   const today = getTodayString();
+  
   if (lastDate !== today) {
-    localStorage.setItem("lastRecommendationDate", today);
-    localStorage.setItem("recommendationCount", "0");
-    return 0;
+    resetAllTodayData();
+    return true; // 초기화됨
   }
+  return false; // 초기화되지 않음
+};
+
+const getRecommendationCount = () => {
+  checkAndResetIfNeeded();
   return parseInt(localStorage.getItem("recommendationCount") || "0", 10);
+};
+
+// 오늘 추천받은 곡 리스트 관리
+const getTodayRecommendedSongs = () => {
+  const wasReset = checkAndResetIfNeeded();
+  if (wasReset) return [];
+  
+  try {
+    return JSON.parse(localStorage.getItem("todayRecommendedSongs") || "[]");
+  } catch (e) {
+    console.error("todayRecommendedSongs 파싱 오류:", e);
+    return [];
+  }
 };
 
 interface Song {
@@ -116,24 +164,21 @@ export default function TodayPageContent() {
     setTimeout(() => setToast(""), 1500);
   };
 
+  // 날짜 체크 및 데이터 로드
   useEffect(() => {
     if (typeof window === 'undefined') return;
     
-    const getTodayString = () => new Date().toDateString();
-    const today = getTodayString();
-    const lastDate = localStorage.getItem("lastRecommendationDate");
+    // 통합된 초기화 체크
+    const wasReset = checkAndResetIfNeeded();
     
-    // 날짜가 바뀌었으면 모든 데이터 초기화
-    if (lastDate !== today) {
-      localStorage.setItem("lastRecommendationDate", today);
-      localStorage.setItem("recommendationCount", "0");
-      localStorage.setItem("todayRecommendedSongs", "[]"); // 추천 곡 목록 초기화
+    if (wasReset) {
+      // 초기화된 경우
       setRecommendedSongs([]);
       setRecommendCount(0);
     } else {
       // 같은 날이면 기존 데이터 불러오기
-      const songs: Song[] = JSON.parse(localStorage.getItem("todayRecommendedSongs") || "[]");
-      const count = parseInt(localStorage.getItem("recommendationCount") || "0", 10);
+      const songs = getTodayRecommendedSongs();
+      const count = getRecommendationCount();
       setRecommendedSongs(songs);
       setRecommendCount(count);
     }

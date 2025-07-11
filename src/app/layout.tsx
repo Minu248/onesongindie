@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
+import DevTools from "./components/DevTools";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -50,6 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             height="0" width="0" style={{display:'none',visibility:'hidden'}}></iframe>
         </noscript>
         {/* End Google Tag Manager (noscript) */}
+        <DevTools />
         <Providers>
           {children}
         </Providers>

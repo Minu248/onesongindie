@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { APP_VERSION } from "@/config/appVersion";
 
 interface Song {
   "곡 제목": string;
@@ -8,35 +9,94 @@ interface Song {
   "링크": string;
 }
 
+// 통합된 초기화 함수 - 모든 관련 데이터를 완전히 초기화
+const resetAllTodayData = () => {
+  const today = new Date().toDateString();
+  localStorage.setItem("lastRecommendationDate", today);
+  localStorage.setItem("recommendationCount", "0");
+  localStorage.setItem("todayRecommendedSongs", JSON.stringify([]));
+  localStorage.setItem("todaySong", ""); // 빈 문자열로 초기화
+  localStorage.setItem("appVersion", APP_VERSION); // 앱 버전 저장
+};
+
+// 앱 버전 체크를 통한 강제 초기화
+const forceResetIfNeeded = () => {
+  const storedVersion = localStorage.getItem("appVersion");
+  if (storedVersion !== APP_VERSION) {
+    console.log(`앱 버전이 업데이트되었습니다 (${storedVersion} -> ${APP_VERSION}). 데이터를 초기화합니다.`);
+    resetAllTodayData();
+    return true;
+  }
+  return false;
+};
+
+// 날짜 체크 및 필요시 초기화
+const checkAndResetIfNeeded = () => {
+  // 먼저 앱 버전 체크
+  const wasForceReset = forceResetIfNeeded();
+  if (wasForceReset) return true;
+  
+  // 날짜 체크
+  const lastDate = localStorage.getItem("lastRecommendationDate");
+  const today = new Date().toDateString();
+  
+  if (lastDate !== today) {
+    resetAllTodayData();
+    return true; // 초기화됨
+  }
+  return false; // 초기화되지 않음
+};
+
+// 오늘 추천받은 곡 리스트 관리
+const getTodayRecommendedSongs = () => {
+  const wasReset = checkAndResetIfNeeded();
+  if (wasReset) return [];
+  
+  try {
+    return JSON.parse(localStorage.getItem("todayRecommendedSongs") || "[]");
+  } catch (e) {
+    console.error("todayRecommendedSongs 파싱 오류:", e);
+    return [];
+  }
+};
+
+const getRecommendationCount = () => {
+  checkAndResetIfNeeded();
+  return parseInt(localStorage.getItem("recommendationCount") || "0", 10);
+};
+
 export default function TodaySongsPage() {
   const [songs, setSongs] = useState<Song[]>([]);
   const [hasRecommendedToday, setHasRecommendedToday] = useState(false);
 
   useEffect(() => {
-    // 날짜 체크 및 초기화 함수
-    const checkAndResetSongs = () => {
-      const lastDate = localStorage.getItem("lastRecommendationDate");
-      const today = new Date().toDateString();
-      if (lastDate !== today) {
-        localStorage.setItem("lastRecommendationDate", today);
-        localStorage.setItem("todayRecommendedSongs", JSON.stringify([]));
-        setSongs([]);
-        setHasRecommendedToday(false);
-        return;
-      }
-      
-      const recommendCount = parseInt(localStorage.getItem("recommendationCount") || "0", 10);
+    // 통합된 초기화 체크 및 데이터 로드
+    const wasReset = checkAndResetIfNeeded();
+    
+    if (wasReset) {
+      // 초기화된 경우
+      setSongs([]);
+      setHasRecommendedToday(false);
+    } else {
+      // 같은 날이면 기존 데이터 불러오기
+      const recommendCount = getRecommendationCount();
       setHasRecommendedToday(recommendCount > 0);
       
-      const todaySongs: Song[] = JSON.parse(localStorage.getItem("todayRecommendedSongs") || "[]");
+      const todaySongs = getTodayRecommendedSongs();
       // 중복 제거 (링크 기준)
       const unique = todaySongs.filter((v, i, arr) => arr.findIndex(s => s["링크"] === v["링크"]) === i);
       setSongs(unique);
-    };
-
-    checkAndResetSongs();
-    // 1분마다 날짜 체크
-    const interval = setInterval(checkAndResetSongs, 60 * 1000);
+    }
+    
+    // 1분마다 날짜 체크 (선택사항 - 실시간 업데이트를 원할 경우)
+    const interval = setInterval(() => {
+      const wasReset = checkAndResetIfNeeded();
+      if (wasReset) {
+        setSongs([]);
+        setHasRecommendedToday(false);
+      }
+    }, 60 * 1000);
+    
     return () => clearInterval(interval);
   }, []);
 

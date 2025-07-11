@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { signIn, signOut } from "next-auth/react";
 import { useSession } from "next-auth/react";
+import { APP_VERSION } from "@/config/appVersion";
 
 const LpIcon = () => (
   <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="mr-2">
@@ -28,14 +29,46 @@ const getTodayString = () => {
   return new Date().toDateString();
 };
 
-const getRecommendationCount = () => {
+// 통합된 초기화 함수 - 모든 관련 데이터를 완전히 초기화
+const resetAllTodayData = () => {
+  const today = getTodayString();
+  localStorage.setItem("lastRecommendationDate", today);
+  localStorage.setItem("recommendationCount", "0");
+  localStorage.setItem("todayRecommendedSongs", JSON.stringify([]));
+  localStorage.setItem("todaySong", ""); // 빈 문자열로 초기화
+  localStorage.setItem("appVersion", APP_VERSION); // 앱 버전 저장
+};
+
+// 앱 버전 체크를 통한 강제 초기화
+const forceResetIfNeeded = () => {
+  const storedVersion = localStorage.getItem("appVersion");
+  if (storedVersion !== APP_VERSION) {
+    console.log(`앱 버전이 업데이트되었습니다 (${storedVersion} -> ${APP_VERSION}). 데이터를 초기화합니다.`);
+    resetAllTodayData();
+    return true;
+  }
+  return false;
+};
+
+// 날짜 체크 및 필요시 초기화
+const checkAndResetIfNeeded = () => {
+  // 먼저 앱 버전 체크
+  const wasForceReset = forceResetIfNeeded();
+  if (wasForceReset) return true;
+  
+  // 날짜 체크
   const lastDate = localStorage.getItem("lastRecommendationDate");
   const today = getTodayString();
+  
   if (lastDate !== today) {
-    localStorage.setItem("lastRecommendationDate", today);
-    localStorage.setItem("recommendationCount", "0");
-    return 0;
+    resetAllTodayData();
+    return true; // 초기화됨
   }
+  return false; // 초기화되지 않음
+};
+
+const getRecommendationCount = () => {
+  checkAndResetIfNeeded();
   return parseInt(localStorage.getItem("recommendationCount") || "0", 10);
 };
 
@@ -45,13 +78,11 @@ const incrementRecommendationCount = () => {
 };
 
 const canGetRecommendation = () => {
-  const lastRecommendationDate = localStorage.getItem("lastRecommendationDate");
-  const today = getTodayString();
+  const wasReset = checkAndResetIfNeeded();
+  if (wasReset) return true;
   
-  if (!lastRecommendationDate || lastRecommendationDate !== today) {
-    return true;
-  }
-  return false;
+  const count = parseInt(localStorage.getItem("recommendationCount") || "0", 10);
+  return count < MAX_RECOMMENDATION_PER_DAY;
 };
 
 const setRecommendationUsed = () => {
@@ -59,14 +90,18 @@ const setRecommendationUsed = () => {
 };
 
 const getStoredTodaySong = (): Song | null => {
-  const storedDate = localStorage.getItem("lastRecommendationDate");
-  const today = getTodayString();
+  const wasReset = checkAndResetIfNeeded();
+  if (wasReset) return null;
   
-  if (storedDate === today) {
-    const storedSong = localStorage.getItem("todaySong");
-    return storedSong ? JSON.parse(storedSong) : null;
+  const storedSong = localStorage.getItem("todaySong");
+  if (!storedSong) return null;
+  
+  try {
+    return JSON.parse(storedSong);
+  } catch (e) {
+    console.error("todaySong 파싱 오류:", e);
+    return null;
   }
-  return null;
 };
 
 const setStoredTodaySong = (song: Song) => {
@@ -75,18 +110,19 @@ const setStoredTodaySong = (song: Song) => {
 
 // 오늘 추천받은 곡 리스트 관리
 const getTodayRecommendedSongs = (): Song[] => {
-  const lastDate = localStorage.getItem("lastRecommendationDate");
-  const today = getTodayString();
-  if (lastDate !== today) {
-    localStorage.setItem("lastRecommendationDate", today);
-    localStorage.setItem("todayRecommendedSongs", JSON.stringify([]));
+  const wasReset = checkAndResetIfNeeded();
+  if (wasReset) return [];
+  
+  try {
+    return JSON.parse(localStorage.getItem("todayRecommendedSongs") || "[]");
+  } catch (e) {
+    console.error("todayRecommendedSongs 파싱 오류:", e);
     return [];
   }
-  return JSON.parse(localStorage.getItem("todayRecommendedSongs") || "[]");
 };
 
 const addTodayRecommendedSong = (song: Song) => {
-  const list = JSON.parse(localStorage.getItem("todayRecommendedSongs") || "[]");
+  const list = getTodayRecommendedSongs();
   // 이미 동일한 링크가 있으면 추가하지 않음
   if (!list.find((s: Song) => s["링크"] === song["링크"])) {
     list.push(song);
