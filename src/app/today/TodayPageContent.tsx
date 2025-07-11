@@ -150,7 +150,6 @@ export default function TodayPageContent() {
     const [dragStartX, setDragStartX] = useState(0);
     const playersRef = useRef<{[key: number]: any}>({});
     const playerContainerRefs = useRef<{[key: number]: HTMLDivElement | null}>({});
-    const backgroundTimerRef = useRef<NodeJS.Timeout | null>(null);
 
 
     const songs = recommendedSongs.length > 0 ? recommendedSongs : Array(10).fill({
@@ -224,40 +223,11 @@ export default function TodayPageContent() {
           events: {
             onReady: (event: any) => {
               console.log(`플레이어 ${index} 준비 완료`);
-              
-              // 백그라운드에서도 작동하는 타이머 설정
-              const player = event.target;
-              try {
-                const duration = player.getDuration();
-                if (duration && duration > 0) {
-                  console.log(`곡 ${index} 길이: ${duration}초, 백그라운드 타이머 설정`);
-                  
-                  // 기존 타이머 정리
-                  if (backgroundTimerRef.current) {
-                    clearTimeout(backgroundTimerRef.current);
-                  }
-                  
-                  // 동영상 길이 + 2초 후 자동 슬라이드 (백그라운드에서도 작동)
-                  backgroundTimerRef.current = setTimeout(() => {
-                    console.log(`백그라운드 타이머로 곡 ${index} 다음 곡으로 이동`);
-                    const len = songs.length;
-                    setCurrentIndex((prev) => (prev + 1) % len);
-                  }, (duration + 2) * 1000);
-                }
-              } catch (error) {
-                console.warn('Duration 가져오기 실패:', error);
-              }
             },
             onStateChange: (event: any) => {
-              // 재생 종료 시 (0 = ended) - 우선순위 높음
+              // 재생 종료 시 (0 = ended) 다음 곡으로 이동
               if (event.data === 0) {
                 console.log(`곡 ${index} 재생 종료, 다음 곡으로 이동`);
-                
-                // 백그라운드 타이머 정리 (이미 끝났으므로)
-                if (backgroundTimerRef.current) {
-                  clearTimeout(backgroundTimerRef.current);
-                  backgroundTimerRef.current = null;
-                }
                 
                 setTimeout(() => {
                   const len = songs.length;
@@ -291,12 +261,6 @@ export default function TodayPageContent() {
     useEffect(() => {
       if (!isYouTubeAPIReady) return;
 
-      // 기존 백그라운드 타이머 정리
-      if (backgroundTimerRef.current) {
-        clearTimeout(backgroundTimerRef.current);
-        backgroundTimerRef.current = null;
-      }
-
       // 모든 플레이어 정리
       Object.keys(playersRef.current).forEach(key => {
         const index = parseInt(key);
@@ -316,17 +280,12 @@ export default function TodayPageContent() {
       }
     }, [currentIndex, isYouTubeAPIReady, songs, createYouTubePlayer, destroyPlayer]);
 
-    // 컴포넌트 언마운트 시 모든 플레이어 및 타이머 정리
+    // 컴포넌트 언마운트 시 모든 플레이어 정리
     useEffect(() => {
       return () => {
         Object.keys(playersRef.current).forEach(key => {
           destroyPlayer(parseInt(key));
         });
-        
-        // 백그라운드 타이머 정리
-        if (backgroundTimerRef.current) {
-          clearTimeout(backgroundTimerRef.current);
-        }
       };
     }, [destroyPlayer]);
 
