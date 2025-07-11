@@ -45,6 +45,7 @@ export default function TodayPageContent() {
   const [recommendCount, setRecommendCount] = useState(0);
   const [recommendedSongs, setRecommendedSongs] = useState<Song[]>([]);
   const [isYouTubeAPIReady, setIsYouTubeAPIReady] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   // YouTube IFrame API 로드
   useEffect(() => {
@@ -72,7 +73,14 @@ export default function TodayPageContent() {
     };
   }, []);
 
-
+  // 컴포넌트 로드 애니메이션
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoaded(true);
+    }, 800); // 800ms 후 슬라이드 애니메이션 시작 (텍스트 애니메이션과 조화)
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   // 유튜브 ID 추출 함수
   const getYoutubeId = (url: string) => {
@@ -160,8 +168,13 @@ export default function TodayPageContent() {
         else if (i === currentIndex - 1 || (currentIndex === 0 && i === songs.length - 1)) slide.classList.add("previous");
         else if (i === currentIndex + 1 || (currentIndex === songs.length - 1 && i === 0)) slide.classList.add("next");
         else slide.classList.add("idle");
+        
+        // 로드 애니메이션 적용
+        if (isLoaded) {
+          slide.classList.add("loaded");
+        }
       });
-    }, [currentIndex, songs.length]);
+    }, [currentIndex, songs.length, isLoaded]);
 
     const prevSlide = () => {
       const len = songs.length;
@@ -417,7 +430,7 @@ export default function TodayPageContent() {
     return (
       <div 
         ref={containerRef}
-        className="slider-container relative w-full h-full perspective-1000 overflow-visible pt-64"
+        className="slider-container relative w-full h-full perspective-1000 overflow-visible"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -504,12 +517,18 @@ export default function TodayPageContent() {
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#FF2A68] via-[#A033FF] to-[#0B63F6] px-4 overflow-x-hidden">
-      <div className="text-center mb-4">
+      <div className={`text-center mb-4 transition-all duration-800 ease-out ${
+        isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
+      }`}>
         <div className="text-lg text-white/90 mt-4 mb-2">들어볼래?</div>
         <div className="text-4xl font-bold text-white drop-shadow">한 곡 Indie</div>
       </div>
-      <div className="mb-2 text-white/90 text-base text-center font-medium">당신의 하루를 바꿔줄 한국 인디 음악을 발견하세요</div>
-      <div className="mb-8 md:mb-2 text-white/90 text-base text-center font-medium">하루에 한 번 10곡의 음악을 추천 받을 수 있어요</div>
+      <div className={`mb-2 text-white/90 text-base text-center font-medium transition-all duration-800 ease-out ${
+        isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
+      }`} style={{ transitionDelay: '200ms' }}>당신의 하루를 바꿔줄 한국 인디 음악을 발견하세요</div>
+      <div className={`mb-8 md:mb-2 text-white/90 text-base text-center font-medium transition-all duration-800 ease-out ${
+        isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
+      }`} style={{ transitionDelay: '400ms' }}>하루에 한 번 10곡의 음악을 추천 받을 수 있어요</div>
       <div className="w-full max-w-2xl mb-6 mt-10 md:mb-16 md:mt-32 relative h-[700px] z-20">
         <SongSlider />
       </div>
@@ -523,14 +542,21 @@ export default function TodayPageContent() {
         }
         .slide {
           position: absolute;
-          top: 85%; left: 50%;
+          top: 30%; left: 50%;
           width: 100%;
           max-width: 36rem;
           height: auto;
-          transform-origin: center center;
+          transform-origin: center top;
           backface-visibility: hidden;
-          transition: transform 0.8s ease-in-out, filter 0.8s ease-in-out;
+          transition: transform 0.8s ease-in-out, filter 0.8s ease-in-out, opacity 1s ease-out;
           will-change: transform;
+          transform: translate3d(-50%, 0, -200px) scale(0.6) rotateY(0deg);
+          filter: blur(6px);
+          z-index: 1;
+          opacity: 0;
+        }
+        .slide.loaded {
+          opacity: 1;
         }
         .song-detail-box {
           width: 100%;
@@ -538,13 +564,14 @@ export default function TodayPageContent() {
           height: auto;
           overflow-y: auto;
         }
-        .slide.current { transform: translate3d(-50%, -50%, 120px) scale(1) rotateY(0deg); filter: blur(0px); z-index: 10; }
-        .slide.previous { transform: translate3d(calc(-50% - 360px), -50%, 60px) scale(0.8) rotateY(30deg); filter: blur(3px); z-index: 5; }
-        .slide.next { transform: translate3d(calc(-50% + 360px), -50%, 60px) scale(0.8) rotateY(-30deg); filter: blur(3px); z-index: 5; }
-        .slide.idle { transform: translate3d(-50%, -50%, -200px) scale(0.6) rotateY(0deg); filter: blur(6px); z-index: 1; }
+        .slide.current { transform: translate3d(-50%, -8%, 120px) scale(1) rotateY(0deg); filter: blur(0px); z-index: 10; }
+        .slide.previous { transform: translate3d(calc(-50% - 360px), 0, 60px) scale(0.8) rotateY(30deg); filter: blur(3px); z-index: 5; }
+        .slide.next { transform: translate3d(calc(-50% + 360px), 0, 60px) scale(0.8) rotateY(-30deg); filter: blur(3px); z-index: 5; }
+        .slide.idle { transform: translate3d(-50%, 0, -200px) scale(0.6) rotateY(0deg); filter: blur(6px); z-index: 1; }
         @media (min-width: 768px) {
-          .slide.previous { transform: translate3d(calc(-50% - 420px), -50%, 60px) scale(0.8) rotateY(30deg); }
-          .slide.next { transform: translate3d(calc(-50% + 420px), -50%, 60px) scale(0.8) rotateY(-30deg); }
+          .slide.current { transform: translate3d(-50%, -15%, 120px) scale(1) rotateY(0deg); filter: blur(0px); z-index: 10; }
+          .slide.previous { transform: translate3d(calc(-50% - 420px), -8%, 60px) scale(0.8) rotateY(30deg); }
+          .slide.next { transform: translate3d(calc(-50% + 420px), -8%, 60px) scale(0.8) rotateY(-30deg); }
         }
         .slider-container,
         .slider-container *,
