@@ -45,6 +45,7 @@ export default function TodayPageContent() {
   const [recommendCount, setRecommendCount] = useState(0);
   const [recommendedSongs, setRecommendedSongs] = useState<Song[]>([]);
   const [isYouTubeAPIReady, setIsYouTubeAPIReady] = useState(false);
+  const [isPageVisible, setIsPageVisible] = useState(true);
 
   // YouTube IFrame API 로드
   useEffect(() => {
@@ -69,6 +70,21 @@ export default function TodayPageContent() {
     
     return () => {
       document.head.removeChild(script);
+    };
+  }, []);
+
+  // Page Visibility API로 탭 활성화 상태 추적
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    const handleVisibilityChange = () => {
+      setIsPageVisible(!document.hidden);
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
 
@@ -140,6 +156,7 @@ export default function TodayPageContent() {
     const [dragStartX, setDragStartX] = useState(0);
     const playersRef = useRef<{[key: number]: any}>({});
     const playerContainerRefs = useRef<{[key: number]: HTMLDivElement | null}>({});
+    const autoSlideTimerRef = useRef<NodeJS.Timeout | null>(null);
 
     const songs = recommendedSongs.length > 0 ? recommendedSongs : Array(10).fill({
       "곡 제목": "예시 곡 제목",
@@ -207,6 +224,22 @@ export default function TodayPageContent() {
           events: {
             onReady: (event: any) => {
               console.log(`플레이어 ${index} 준비 완료`);
+              // 플레이어 준비 완료 시 duration 기반 타이머 설정
+              const player = event.target;
+              const duration = player.getDuration();
+              if (duration > 0) {
+                // 백그라운드에서도 작동하는 자동 슬라이드 타이머 설정
+                setAutoSlideTimer(duration);
+                
+                // 추가 백업 타이머 (더 긴 지연)
+                setTimeout(() => {
+                  // 현재 플레이어가 여전히 활성 상태인지 확인
+                  if (playersRef.current[index] === player) {
+                    console.log(`최종 백업 타이머로 곡 ${index} 다음 곡으로 이동`);
+                    nextSlide();
+                  }
+                }, (duration + 5) * 1000);
+              }
             },
             onStateChange: (event: any) => {
               // 재생 종료 시 (0 = ended)
@@ -215,6 +248,35 @@ export default function TodayPageContent() {
                 setTimeout(() => {
                   nextSlide();
                 }, 1000); // 1초 후 다음 슬라이드로 이동
+              }
+              // 재생 중일 때 (1 = playing) 주기적으로 상태 체크
+              else if (event.data === 1) {
+                const player = event.target;
+                const checkProgress = () => {
+                  try {
+                    const currentTime = player.getCurrentTime();
+                    const duration = player.getDuration();
+                    
+                    // 재생이 끝에 가까우면 다음 슬라이드 준비
+                    if (duration > 0 && currentTime >= duration - 1) {
+                      console.log(`곡 ${index} 거의 종료, 다음 곡으로 이동`);
+                      setTimeout(() => {
+                        nextSlide();
+                      }, 1000);
+                      return;
+                    }
+                    
+                    // 플레이어가 여전히 활성 상태면 계속 체크
+                    if (playersRef.current[index] === player) {
+                      setTimeout(checkProgress, 1000); // 1초마다 체크
+                    }
+                  } catch (e) {
+                    console.warn('플레이어 상태 체크 중 오류:', e);
+                  }
+                };
+                
+                // 재생 시작 후 상태 체크 시작
+                setTimeout(checkProgress, 1000);
               }
             },
             onError: (event: any) => {
@@ -238,6 +300,20 @@ export default function TodayPageContent() {
         }
       }
     }, []);
+
+    // 백그라운드 자동 슬라이드 타이머 설정
+    const setAutoSlideTimer = useCallback((duration: number) => {
+      // 기존 타이머 제거
+      if (autoSlideTimerRef.current) {
+        clearTimeout(autoSlideTimerRef.current);
+      }
+      
+      // 새 타이머 설정 (동영상 길이 + 3초 후 자동 슬라이드)
+      autoSlideTimerRef.current = setTimeout(() => {
+        console.log('백그라운드 자동 슬라이드 타이머 실행');
+        nextSlide();
+      }, (duration + 3) * 1000);
+    }, [nextSlide]);
 
     // 현재 슬라이드 변경 시 플레이어 관리
     useEffect(() => {
@@ -265,12 +341,17 @@ export default function TodayPageContent() {
       }, 500); // 0.5초 후 정리
     }, [currentIndex, isYouTubeAPIReady, songs, createYouTubePlayer, destroyPlayer]);
 
-    // 컴포넌트 언마운트 시 모든 플레이어 정리
+    // 컴포넌트 언마운트 시 모든 플레이어 및 타이머 정리
     useEffect(() => {
       return () => {
         Object.keys(playersRef.current).forEach(key => {
           destroyPlayer(parseInt(key));
         });
+        
+        // 자동 슬라이드 타이머 정리
+        if (autoSlideTimerRef.current) {
+          clearTimeout(autoSlideTimerRef.current);
+        }
       };
     }, [destroyPlayer]);
 
