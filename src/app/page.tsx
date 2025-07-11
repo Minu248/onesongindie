@@ -47,12 +47,12 @@ export async function generateMetadata({ searchParams }) {
   
   return {
     // SEO: 기본 타이틀과 메타디스크립션
-    title: "한곡인디, 매일 추천 받는 한국 인디 음악",
-    description: "플레이리스트가 힙해지는 음악 추천. 지금까지 몰랐던 한국 인디 음악을 매일 아침 새롭게 발견하세요.",
+    title: "한곡인디, 매일 새로운 인디음악 플레이리스트",
+    description: "인디 음악 플레이리스 추천. 지금까지 몰랐던 한국 인디 음악을 매일 새롭게 발견하세요.",
     metadataBase: new URL('https://onesongindie.com'),
     openGraph: {
-      title: "한곡인디, 매일 추천 받는 한국 인디 음악",
-      description: "플레이리스트가 힙해지는 음악 추천. 지금까지 몰랐던 한국 인디 음악을 매일 아침 새롭게 발견하세요.",
+      title: "한곡인디, 매일 새로운 인디음악 플레이리스트",
+      description: "인디 음악 플레이리스 추천. 지금까지 몰랐던 한국 인디 음악을 매일 새롭게 발견하세요.",
       url: "https://onesongindie.com",
       type: "website",
       siteName: "들어볼래? 한 곡 Indie",
@@ -67,8 +67,8 @@ export async function generateMetadata({ searchParams }) {
     },
     twitter: {
       card: "summary_large_image",
-      title: "한곡인디, 매일 추천 받는 한국 인디 음악",
-      description: "플레이리스트가 힙해지는 음악 추천. 지금까지 몰랐던 한국 인디 음악을 매일 아침 새롭게 발견하세요.",
+      title: "한곡인디, 매일 새로운 인디음악 플레이리스트",
+      description: "인디 음악 플레이리스 추천. 지금까지 몰랐던 한국 인디 음악을 매일 새롭게 발견하세요.",
       images: ["https://onesongindie.com/og-image.png"],
     },
     icons: {
