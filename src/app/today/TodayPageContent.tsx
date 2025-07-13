@@ -457,7 +457,7 @@ const SongSlider = ({ songsData, isYouTubeAPIReady, onLike, onShare }: SongSlide
             <Link href="/playlist" className="text-[#A033FF] underline mt-2">내 플레이리스트 보기</Link>
             <div className="w-full flex flex-col gap-4 mt-6">
               <Link href="/today/songs" className="w-full">
-                <button className="w-full bg-[#A033FF] text-white rounded-full px-6 py-3 shadow-md hover:bg-[#7c25c9] transition text-base font-semibold">오늘 추천 받은 곡 보기</button>
+                <button className="w-full bg-[#A033FF] text-white rounded-full px-6 py-3 shadow-md hover:bg-[#7c25c9] transition text-base font-semibold">오늘 추천 받은 곡 리스트</button>
               </Link>
               <a href="https://forms.gle/zQTC3ab4sgzJEPEY6" target="_blank" rel="noopener noreferrer" className="w-full">
                 <button className="w-full bg-[#fc26d5] text-white rounded-full px-6 py-3 shadow-md hover:bg-[#7c25c9] transition text-base font-semibold">나만 알고 있는 인디 노래 제보하기</button>
@@ -528,7 +528,7 @@ export default function TodayPageContent() {
       liked.push(song);
       localStorage.setItem("likedSongs", JSON.stringify(liked));
     }
-    setToast("플레이리스트에 저장했어요!");
+    setToast("플레이리스트에 저장했어요❤️");
     setTimeout(() => setToast(""), 1500);
   }, []);
 
@@ -598,7 +598,7 @@ export default function TodayPageContent() {
         />
       </div>
       {toast && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-black text-white px-4 py-2 rounded shadow-lg text-sm z-50 animate-fade-in">{toast}</div>
+        <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black text-white px-4 py-2 rounded shadow-lg text-sm z-50 animate-fade-in">{toast}</div>
       )}
       <style jsx global>{`
         .slider-track { 
