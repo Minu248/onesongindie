@@ -244,7 +244,7 @@ export default function HomeContent() {
     <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#FF2A68] via-[#A033FF] to-[#0B63F6] px-4">
       <div className="text-center mb-8">
         <div className="text-lg text-white/90 mb-2">들어볼래?</div>
-        <div className="text-5xl font-bold text-white drop-shadow">한 곡 Indie</div>
+        <div className="text-5xl font-bold text-white drop-shadow">한곡인디</div>
       </div>
       <button
         className={`w-32 h-32 ${canRecommend ? 'bg-white/20 hover:bg-white/30' : 'bg-gray-400/20 hover:bg-gray-400/30'} text-white rounded-full shadow-lg transition mb-4 flex items-center justify-center text-4xl border-2 border-white/40 backdrop-blur`}

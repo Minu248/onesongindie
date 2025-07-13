@@ -10,7 +10,7 @@ export async function generateMetadata({ searchParams }) {
   
   if (title && artist) {
     return {
-      title: `${title} - ${artist} | 들어볼래? 한 곡 Indie`,
+      title: `${title} - ${artist} | 들어볼래? 한곡인디`,
       description: `친구가 추천한 한국 인디 노래: ${title} - ${artist}`,
       metadataBase: new URL('https://onesongindie.com'),
       openGraph: {
@@ -18,7 +18,7 @@ export async function generateMetadata({ searchParams }) {
         description: `친구가 추천한 한국 인디 노래: ${title} - ${artist}`,
         url: "https://onesongindie.com",
         type: "website",
-        siteName: "들어볼래? 한 곡 Indie",
+        siteName: "들어볼래? 한곡인디",
         images: [
           {
             url: "https://onesongindie.com/og-image.png",
@@ -55,7 +55,7 @@ export async function generateMetadata({ searchParams }) {
       description: "인디 음악 플레이리스 추천. 지금까지 몰랐던 한국 인디 음악을 매일 새롭게 발견하세요.",
       url: "https://onesongindie.com",
       type: "website",
-      siteName: "들어볼래? 한 곡 Indie",
+      siteName: "들어볼래? 한곡인디e",
       images: [
         {
           url: "https://onesongindie.com/og-image.png",
