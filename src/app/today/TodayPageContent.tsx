@@ -2,7 +2,31 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { APP_VERSION } from "@/config/appVersion";
+import { Song, SongSliderProps } from "@/types/song";
+import { 
+  TOAST_MESSAGES, 
+  ANIMATION_TIMING, 
+  TOUCH_SETTINGS, 
+  API_ENDPOINTS 
+} from "@/config/constants";
+import { 
+  getRecommendationCount, 
+  getTodayRecommendedSongs, 
+  checkAndResetIfNeeded 
+} from "@/utils/localStorage";
+import { 
+  getYoutubeId, 
+  getYouTubeMusicUrl, 
+  getAppleMusicUrl, 
+  getSpotifyUrl, 
+  getVibeUrl,
+  getYouTubeThumbnailUrl,
+  createSearchQuery,
+  createShareUrl
+} from "@/utils/musicUtils";
+import { useToast } from "@/utils/hooks/useToast";
+import { Toast } from "@/app/components/Toast";
+import { LpIcon } from "@/app/components/LpIcon";
 
 // YouTube IFrame API 타입 정의
 declare global {
@@ -11,104 +35,6 @@ declare global {
     onYouTubeIframeAPIReady: () => void;
   }
 }
-
-// LP 아이콘 컴포넌트
-const LpIcon = () => (
-  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="mr-2">
-    <circle cx="16" cy="16" r="15" fill="#111" stroke="#222" strokeWidth="2" />
-    <circle cx="16" cy="16" r="7" fill="#F55" />
-    <circle cx="16" cy="16" r="2" fill="#FDD" />
-    <path d="M8 8a12 12 0 0 1 16 0" stroke="#333" strokeWidth="2" />
-    <path d="M8 24a12 12 0 0 0 16 0" stroke="#333" strokeWidth="2" />
-  </svg>
-);
-
-const MAX_RECOMMENDATION_PER_DAY = 1;
-
-const getTodayString = () => new Date().toDateString();
-
-// 통합된 초기화 함수 - 모든 관련 데이터를 완전히 초기화
-const resetAllTodayData = () => {
-  const today = getTodayString();
-  localStorage.setItem("lastRecommendationDate", today);
-  localStorage.setItem("recommendationCount", "0");
-  localStorage.setItem("todayRecommendedSongs", JSON.stringify([]));
-  localStorage.setItem("todaySong", ""); // 빈 문자열로 초기화
-  localStorage.setItem("appVersion", APP_VERSION); // 앱 버전 저장
-};
-
-// 앱 버전 체크를 통한 강제 초기화
-const forceResetIfNeeded = () => {
-  const storedVersion = localStorage.getItem("appVersion");
-  if (storedVersion !== APP_VERSION) {
-    console.log(`앱 버전이 업데이트되었습니다 (${storedVersion} -> ${APP_VERSION}). 데이터를 초기화합니다.`);
-    resetAllTodayData();
-    return true;
-  }
-  return false;
-};
-
-// 날짜 체크 및 필요시 초기화
-const checkAndResetIfNeeded = () => {
-  // 먼저 앱 버전 체크
-  const wasForceReset = forceResetIfNeeded();
-  if (wasForceReset) return true;
-  
-  // 날짜 체크
-  const lastDate = localStorage.getItem("lastRecommendationDate");
-  const today = getTodayString();
-  
-  if (lastDate !== today) {
-    resetAllTodayData();
-    return true; // 초기화됨
-  }
-  return false; // 초기화되지 않음
-};
-
-const getRecommendationCount = () => {
-  checkAndResetIfNeeded();
-  return parseInt(localStorage.getItem("recommendationCount") || "0", 10);
-};
-
-// 오늘 추천받은 곡 리스트 관리
-const getTodayRecommendedSongs = () => {
-  const wasReset = checkAndResetIfNeeded();
-  if (wasReset) return [];
-  
-  try {
-    return JSON.parse(localStorage.getItem("todayRecommendedSongs") || "[]");
-  } catch (e) {
-    console.error("todayRecommendedSongs 파싱 오류:", e);
-    return [];
-  }
-};
-
-interface Song {
-  "곡 제목": string;
-  "아티스트": string;
-  "링크": string;
-}
-
-// SongSlider Props 인터페이스
-interface SongSliderProps {
-  songsData: Song[];
-  isYouTubeAPIReady: boolean;
-  onLike: (song: Song) => void;
-  onShare: (song: Song) => void;
-}
-
-// 유튜브 ID 추출 함수
-const getYoutubeId = (url: string) => {
-  if (!url || typeof url !== 'string') return null;
-  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)?)([\w-]{11})/);
-  return match ? match[1] : null;
-};
-
-// 각 음악 플랫폼 검색 URL 생성 함수들
-const getYouTubeMusicUrl = (query: string) => `https://music.youtube.com/search?q=${encodeURIComponent(query)}`;
-const getAppleMusicUrl = (query: string) => `https://music.apple.com/search?term=${encodeURIComponent(query)}`;
-const getSpotifyUrl = (query: string) => `https://open.spotify.com/search/${encodeURIComponent(query)}`;
-const getVibeUrl = (query: string) => `https://vibe.naver.com/search?query=${encodeURIComponent(query)}`;
 
 // SongSlider 컴포넌트 - TodayPageContent 외부로 분리
 const SongSlider = ({ songsData, isYouTubeAPIReady, onLike, onShare }: SongSliderProps) => {
@@ -317,7 +243,6 @@ const SongSlider = ({ songsData, isYouTubeAPIReady, onLike, onShare }: SongSlide
   const handleTouchEnd = () => {
     const swipeDistanceX = Math.abs(touchStart - touchEnd);
     const swipeDistanceY = Math.abs(touchStartY - touchEndY);
-    const minSwipeDistance = 50;
     
     // 세로 스크롤이 가로 스와이프보다 크면 스와이프 무시
     if (swipeDistanceY > swipeDistanceX) {
@@ -325,7 +250,7 @@ const SongSlider = ({ songsData, isYouTubeAPIReady, onLike, onShare }: SongSlide
     }
     
     // 가로 스와이프만 처리
-    if (swipeDistanceX >= minSwipeDistance) {
+    if (swipeDistanceX >= TOUCH_SETTINGS.MIN_SWIPE_DISTANCE) {
       if (touchStart - touchEnd > 0) {
         nextSlide(); // 오른쪽에서 왼쪽으로 스와이프 (다음 슬라이드)
       } else {
@@ -343,9 +268,8 @@ const SongSlider = ({ songsData, isYouTubeAPIReady, onLike, onShare }: SongSlide
   const handleMouseUp = (e: React.MouseEvent) => {
     if (!isDragging) return;
     const dragDistance = e.clientX - dragStartX;
-    const minDragDistance = 50; // 100px에서 50px로 민감도 향상
     
-    if (Math.abs(dragDistance) >= minDragDistance) {
+    if (Math.abs(dragDistance) >= TOUCH_SETTINGS.MIN_DRAG_DISTANCE) {
       if (dragDistance < 0) {
         nextSlide(); // 오른쪽에서 왼쪽으로 드래그 (다음 슬라이드)
       } else {
@@ -366,9 +290,8 @@ const SongSlider = ({ songsData, isYouTubeAPIReady, onLike, onShare }: SongSlide
     }
     
     const delta = e.deltaX;
-    const sensitivity = 50;
-    if (delta > sensitivity) nextSlide();
-    else if (delta < -sensitivity) prevSlide();
+    if (delta > TOUCH_SETTINGS.WHEEL_SENSITIVITY) nextSlide();
+    else if (delta < -TOUCH_SETTINGS.WHEEL_SENSITIVITY) prevSlide();
   }, []);
   const debounce = <F extends (...args: any[]) => any>(func: F, delay: number) => {
     let timeoutId: NodeJS.Timeout;
@@ -425,7 +348,7 @@ const SongSlider = ({ songsData, isYouTubeAPIReady, onLike, onShare }: SongSlide
               ) : (
                 getYoutubeId(song["링크"]) ? (
                   <img 
-                    src={`https://img.youtube.com/vi/${getYoutubeId(song["링크"])}/hqdefault.jpg`} 
+                    src={getYouTubeThumbnailUrl(getYoutubeId(song["링크"])!)} 
                     alt={`${song["곡 제목"]} 썸네일`} 
                     className="w-full h-full object-cover rounded-lg"
                   />
@@ -437,16 +360,16 @@ const SongSlider = ({ songsData, isYouTubeAPIReady, onLike, onShare }: SongSlide
               )}
             </div>
             <div className="flex gap-3 justify-center mb-4">
-              <button onClick={() => window.open(getYouTubeMusicUrl((song["곡 제목"] || "") + ' ' + (song["아티스트"] || "")), '_blank')} className="w-10 h-10 p-1 rounded-[10px] focus:outline-none">
+              <button onClick={() => window.open(getYouTubeMusicUrl(createSearchQuery(song["곡 제목"] || "", song["아티스트"] || "")), '_blank')} className="w-10 h-10 p-1 rounded-[10px] focus:outline-none">
                 <img src="/youtube_music.png" alt="YouTube Music" className="w-full h-full object-contain rounded-[10px]" />
               </button>
-              <button onClick={() => window.open(getAppleMusicUrl((song["곡 제목"] || "") + ' ' + (song["아티스트"] || "")), '_blank')} className="w-10 h-10 p-1 rounded-[10px] focus:outline-none">
+              <button onClick={() => window.open(getAppleMusicUrl(createSearchQuery(song["곡 제목"] || "", song["아티스트"] || "")), '_blank')} className="w-10 h-10 p-1 rounded-[10px] focus:outline-none">
                 <img src="/apple_music.png" alt="Apple Music" className="w-full h-full object-contain rounded-[10px]" />
               </button>
-              <button onClick={() => window.open(getSpotifyUrl((song["곡 제목"] || "") + ' ' + (song["아티스트"] || "")), '_blank')} className="w-10 h-10 p-1 rounded-[10px] focus:outline-none">
+              <button onClick={() => window.open(getSpotifyUrl(createSearchQuery(song["곡 제목"] || "", song["아티스트"] || "")), '_blank')} className="w-10 h-10 p-1 rounded-[10px] focus:outline-none">
                 <img src="/spotify.png" alt="Spotify" className="w-full h-full object-contain rounded-[10px]" />
               </button>
-              <button onClick={() => window.open(getVibeUrl((song["곡 제목"] || "") + ' ' + (song["아티스트"] || "")), '_blank')} className="w-10 h-10 p-1 rounded-[10px] focus:outline-none">
+              <button onClick={() => window.open(getVibeUrl(createSearchQuery(song["곡 제목"] || "", song["아티스트"] || "")), '_blank')} className="w-10 h-10 p-1 rounded-[10px] focus:outline-none">
                 <img src="/vibe.png" alt="Vibe" className="w-full h-full object-contain rounded-[10px]" />
               </button>
             </div>
@@ -459,7 +382,7 @@ const SongSlider = ({ songsData, isYouTubeAPIReady, onLike, onShare }: SongSlide
               <Link href="/today/songs" className="w-full">
                 <button className="w-full bg-[#A033FF] text-white rounded-full px-6 py-3 shadow-md hover:bg-[#7c25c9] transition text-base font-semibold">오늘 추천 받은 곡 리스트</button>
               </Link>
-              <a href="https://forms.gle/zQTC3ab4sgzJEPEY6" target="_blank" rel="noopener noreferrer" className="w-full">
+              <a href={API_ENDPOINTS.FORM_SUBMIT} target="_blank" rel="noopener noreferrer" className="w-full">
                 <button className="w-full bg-[#fc26d5] text-white rounded-full px-6 py-3 shadow-md hover:bg-[#7c25c9] transition text-base font-semibold">나만 알고 있는 인디 노래 제보하기</button>
               </a>
             </div>
@@ -479,7 +402,7 @@ const SongSlider = ({ songsData, isYouTubeAPIReady, onLike, onShare }: SongSlide
 
 export default function TodayPageContent() {
   const router = useRouter();
-  const [toast, setToast] = useState("");
+  const { toastMessage, showToast, isVisible } = useToast();
   const [recommendCount, setRecommendCount] = useState(0);
   const [recommendedSongs, setRecommendedSongs] = useState<Song[]>([]);
   const [isYouTubeAPIReady, setIsYouTubeAPIReady] = useState(false);
@@ -515,7 +438,7 @@ export default function TodayPageContent() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoaded(true);
-    }, 800); // 800ms 후 슬라이드 애니메이션 시작 (텍스트 애니메이션과 조화)
+    }, ANIMATION_TIMING.SLIDER_LOAD_DELAY);
     
     return () => clearTimeout(timer);
   }, []);
@@ -528,18 +451,16 @@ export default function TodayPageContent() {
       liked.push(song);
       localStorage.setItem("likedSongs", JSON.stringify(liked));
     }
-    setToast("플레이리스트에 저장했어요❤️");
-    setTimeout(() => setToast(""), 1500);
-  }, []);
+    showToast(TOAST_MESSAGES.SAVED_TO_PLAYLIST, 1500);
+  }, [showToast]);
 
   // 슬라이더에서 공유 버튼 클릭 시 - useCallback으로 최적화
   const shareSongFromSlider = useCallback((song: Song) => {
     if (!song["곡 제목"] || !song["아티스트"] || !song["링크"]) return;
-    const url = window.location.origin + `/shared?title=${encodeURIComponent(song["곡 제목"])}&artist=${encodeURIComponent(song["아티스트"])}&link=${encodeURIComponent(song["링크"])}`;
+    const url = createShareUrl(song["곡 제목"], song["아티스트"], song["링크"]);
     navigator.clipboard.writeText(url);
-    setToast("링크가 복사되었어요!");
-    setTimeout(() => setToast(""), 1500);
-  }, []);
+    showToast(TOAST_MESSAGES.LINK_COPIED, 1500);
+  }, [showToast]);
 
   // 날짜 체크 및 데이터 로드
   useEffect(() => {
@@ -597,9 +518,7 @@ export default function TodayPageContent() {
           onShare={shareSongFromSlider}
         />
       </div>
-      {toast && (
-        <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black text-white px-4 py-2 rounded shadow-lg text-sm z-50 animate-fade-in">{toast}</div>
-      )}
+      <Toast message={toastMessage} isVisible={isVisible} />
       <style jsx global>{`
         .slider-track { 
           transform-style: preserve-3d; 
