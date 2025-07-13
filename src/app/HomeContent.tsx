@@ -258,7 +258,7 @@ export default function HomeContent() {
   const LoadingScreen = () => (
     <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#FF2A68] via-[#A033FF] to-[#0B63F6] px-4">
       <div className="flex flex-col items-center justify-center">
-        <div className="w-64 h-64 mb-8">
+        <div className="w-64 h-64 md:w-[512px] md:h-[512px] mb-8">
           <img 
             src="/LP-vinyl.png" 
             alt="LP판" 
