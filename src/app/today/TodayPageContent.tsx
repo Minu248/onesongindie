@@ -1,6 +1,7 @@
 "use client";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { APP_VERSION } from "@/config/appVersion";
 
 // YouTube IFrame API 타입 정의
@@ -89,6 +90,7 @@ interface Song {
 }
 
 export default function TodayPageContent() {
+  const router = useRouter();
   const [toast, setToast] = useState("");
   const [recommendCount, setRecommendCount] = useState(0);
   const [recommendedSongs, setRecommendedSongs] = useState<Song[]>([]);
@@ -183,6 +185,20 @@ export default function TodayPageContent() {
       setRecommendCount(count);
     }
   }, []);
+
+  // 추천받은 곡이 없을 때 홈으로 리디렉션
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    // 컴포넌트가 로드되고 데이터가 확인된 후에만 리디렉션 체크
+    const timer = setTimeout(() => {
+      if (recommendedSongs.length === 0) {
+        router.push('/');
+      }
+    }, 100); // 데이터 로드 완료를 기다림
+    
+    return () => clearTimeout(timer);
+  }, [recommendedSongs, router]);
 
   // 3D 커버플로우 슬라이더 컴포넌트
   const SongSlider = () => {
