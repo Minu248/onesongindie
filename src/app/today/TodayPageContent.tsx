@@ -581,7 +581,7 @@ export default function TodayPageContent() {
         isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
       }`}>
         <div className="text-lg text-white/90 mt-4 mb-2">들어볼래?</div>
-        <div className="text-4xl font-bold text-white drop-shadow">한 곡 Indie</div>
+        <div className="text-4xl font-bold text-white drop-shadow">한곡인디</div>
       </div>
       <div className={`mb-2 text-white/90 text-base text-center font-medium transition-all duration-800 ease-out ${
         isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'

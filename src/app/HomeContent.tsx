@@ -138,6 +138,7 @@ export default function HomeContent() {
   const [isSharedMode, setIsSharedMode] = useState(false);
   const [canRecommend, setCanRecommend] = useState(true);
   const [recommendCount, setRecommendCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
   // 컴포넌트 마운트 시 오늘의 곡이 이미 있는지 확인
   useEffect(() => {
@@ -169,7 +170,17 @@ export default function HomeContent() {
 
   const fetchSongAndRedirect = async () => {
     try {
-      const res = await fetch("https://api.sheetbest.com/sheets/88c2b9c7-8d30-462b-ae7c-a4859aaf6955");
+      setIsLoading(true); // 로딩 시작
+      
+      // API 호출을 비동기로 처리하되, 로딩 화면은 계속 유지
+      const fetchPromise = fetch("https://api.sheetbest.com/sheets/88c2b9c7-8d30-462b-ae7c-a4859aaf6955");
+      
+      // 최소 4초는 로딩 화면을 보여주기 위해 Promise.all 사용
+      const [res] = await Promise.all([
+        fetchPromise,
+        new Promise(resolve => setTimeout(resolve, 4000)) // 최소 4초 대기
+      ]);
+      
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       let songs: Song[] = await res.json();
       if (songs.length === 0) throw new Error("곡 데이터가 없습니다");
@@ -179,6 +190,7 @@ export default function HomeContent() {
         const recommendedSongs = getTodayRecommendedSongs();
         songs = songs.filter(song => !recommendedSongs.find(s => s["링크"] === song["링크"]));
         if (songs.length === 0) {
+          setIsLoading(false); // 로딩 종료
           setToast("더 이상 추천할 곡이 없습니다!");
           setTimeout(() => setToast(""), 3000);
           return;
@@ -222,10 +234,12 @@ export default function HomeContent() {
       setCanRecommend(session ? true : getRecommendationCount() < MAX_RECOMMENDATION_PER_DAY);
       setIsSharedMode(false);
       
-      // 곡 정보 쿼리 파라미터로 /today로 이동
+      // 로딩 상태를 유지한 채로 바로 /today로 이동
       router.push(`/today`);
+      
     } catch (error) {
       console.error("fetchSong 에러:", error);
+      setIsLoading(false); // 오류 시 로딩 종료
       setToast("곡을 불러오는 중 오류가 발생했습니다");
       setTimeout(() => setToast(""), 3000);
     }
@@ -239,6 +253,29 @@ export default function HomeContent() {
     }
     fetchSongAndRedirect();
   };
+
+  // 로딩 화면 컴포넌트
+  const LoadingScreen = () => (
+    <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#FF2A68] via-[#A033FF] to-[#0B63F6] px-4">
+      <div className="flex flex-col items-center justify-center">
+        <div className="w-64 h-64 mb-8">
+          <img 
+            src="/LP-vinyl.png" 
+            alt="LP판" 
+            className="w-full h-full animate-spin-slow"
+          />
+        </div>
+        <div className="text-white text-lg font-medium text-center">
+          지금까지 들어본 적 없는<br></br> 새로운 음악을 찾고 있어요
+        </div>
+      </div>
+    </main>
+  );
+
+  // 로딩 중일 때 로딩 화면 표시
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#FF2A68] via-[#A033FF] to-[#0B63F6] px-4">
