@@ -104,35 +104,43 @@ export default function HomeContent() {
   }
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#FF2A68] via-[#A033FF] to-[#0B63F6] px-4">
-      <div className="text-center mb-8">
-        <div className="text-lg text-white/90 mb-2">들어볼래?</div>
-        <div className="text-5xl font-bold text-white drop-shadow">한곡인디</div>
+    <main className="min-h-screen flex flex-col items-center bg-gradient-to-b from-[#FF2A68] via-[#A033FF] to-[#0B63F6] px-4">
+      <div className="flex-grow w-full flex flex-col items-center justify-center">
+        <div className="text-center mb-8">
+          <div className="text-lg text-white/90 mb-2">들어볼래?</div>
+          <div className="text-5xl font-bold text-white drop-shadow">한곡인디</div>
+        </div>
+        
+        <button
+          className={`w-32 h-32 ${canRecommend ? 'bg-white/20 hover:bg-white/30' : 'bg-gray-400/20 hover:bg-gray-400/30'} text-white rounded-full shadow-lg transition mb-4 flex items-center justify-center text-4xl border-2 border-white/40 backdrop-blur`}
+          onClick={handleRecommendClick}
+          aria-label="오늘의 인디 한 곡 추천받기"
+        >
+          {canRecommend ? '🎵' : '⏰'}
+        </button>
+        
+        <div className="mt-1 mb-2 text-white/90 text-base text-center font-medium">
+          당신의 하루를 바꿔줄 한국 인디 음악을 발견하세요
+        </div>
+        
+        <div className="mb-6 text-white/90 text-base text-center font-medium">
+          하루에 한 번 10곡의 음악을 추천 받을 수 있어요
+        </div>
+        
+        {recommendCount > 0 && (
+          <Link href="/today" className="w-full flex justify-center mb-4">
+            <button className="w-full max-w-xs bg-[#A033FF] text-white rounded-full px-6 py-3 shadow-md hover:bg-[#7c25c9] transition text-base font-semibold">
+              오늘 추천 받은 곡 보기
+            </button>
+          </Link>
+        )}
       </div>
       
-      <button
-        className={`w-32 h-32 ${canRecommend ? 'bg-white/20 hover:bg-white/30' : 'bg-gray-400/20 hover:bg-gray-400/30'} text-white rounded-full shadow-lg transition mb-4 flex items-center justify-center text-4xl border-2 border-white/40 backdrop-blur`}
-        onClick={handleRecommendClick}
-        aria-label="오늘의 인디 한 곡 추천받기"
-      >
-        {canRecommend ? '🎵' : '⏰'}
-      </button>
-      
-      <div className="mt-1 mb-2 text-white/90 text-base text-center font-medium">
-        당신의 하루를 바꿔줄 한국 인디 음악을 발견하세요
-      </div>
-      
-      <div className="mb-6 text-white/90 text-base text-center font-medium">
-        하루에 한 번 10곡의 음악을 추천 받을 수 있어요
-      </div>
-      
-      {recommendCount > 0 && (
-        <Link href="/today" className="w-full flex justify-center mb-4">
-          <button className="w-full max-w-xs bg-[#A033FF] text-white rounded-full px-6 py-3 shadow-md hover:bg-[#7c25c9] transition text-base font-semibold">
-            오늘 추천 받은 곡 보기
-          </button>
-        </Link>
-      )}
+      <footer className="w-full text-center py-5">
+        <p className="text-sm text-white/60">
+          © 2025 Minu. All rights reserved.
+        </p>
+      </footer>
       
       <Toast message={toastMessage} isVisible={isVisible} />
     </main>

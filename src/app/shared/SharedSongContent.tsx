@@ -89,43 +89,51 @@ export default function SharedSongContent() {
   const youtubeId = getYoutubeId(song["링크"]);
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#FF2A68] via-[#A033FF] to-[#0B63F6] px-4 py-8">
-      {/* 메시지 */}
-      <div className="text-center mb-6">
-        <div className="text-lg text-white/90 mb-2">✉️ 친구가 추천한 곡이 도착했어요.</div>
-      </div>
+    <main className="min-h-screen flex flex-col items-center bg-gradient-to-b from-[#FF2A68] via-[#A033FF] to-[#0B63F6] px-4 py-8">
+      <div className="flex-grow w-full flex flex-col items-center justify-center">
+        {/* 메시지 */}
+        <div className="text-center mb-6">
+          <div className="text-lg text-white/90 mb-2">✉️ 친구가 추천한 곡이 도착했어요.</div>
+        </div>
 
-      {/* 곡 정보 */}
-      <div className="text-center mb-6">
-        <div className="text-3xl font-bold text-white mb-2">{song["곡 제목"]}</div>
-        <div className="text-xl text-white/90">{song["아티스트"]}</div>
-      </div>
+        {/* 곡 정보 */}
+        <div className="text-center mb-6">
+          <div className="text-3xl font-bold text-white mb-2">{song["곡 제목"]}</div>
+          <div className="text-xl text-white/90">{song["아티스트"]}</div>
+        </div>
 
-      {/* YouTube 플레이어 */}
-      <div className="w-full max-w-2xl aspect-[16/9] mb-8 rounded-lg overflow-hidden shadow-lg">
-        {youtubeId && isYouTubeAPIReady ? (
-          <iframe
-            width="100%"
-            height="100%"
-            src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0&modestbranding=1`}
-            title={`${song["곡 제목"]} - ${song["아티스트"]}`}
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-          />
-        ) : (
-          <div className="w-full h-full bg-black/20 flex items-center justify-center">
-            <div className="text-white">플레이어 로딩 중...</div>
-          </div>
-        )}
-      </div>
+        {/* YouTube 플레이어 */}
+        <div className="w-full max-w-2xl aspect-[16/9] mb-8 rounded-lg overflow-hidden shadow-lg">
+          {youtubeId && isYouTubeAPIReady ? (
+            <iframe
+              width="100%"
+              height="100%"
+              src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0&modestbranding=1`}
+              title={`${song["곡 제목"]} - ${song["아티스트"]}`}
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            />
+          ) : (
+            <div className="w-full h-full bg-black/20 flex items-center justify-center">
+              <div className="text-white">플레이어 로딩 중...</div>
+            </div>
+          )}
+        </div>
 
-      {/* CTA 버튼 */}
-      <Link href="/" className="w-full max-w-xs">
-        <button className="w-full bg-white/20 hover:bg-white/30 text-white rounded-full px-6 py-4 shadow-lg transition text-lg font-semibold backdrop-blur border border-white/30">
-          나도 오늘의 곡 추천받기
-        </button>
-      </Link>
+        {/* CTA 버튼 */}
+        <Link href="/" className="w-full max-w-xs">
+          <button className="w-full bg-white/20 hover:bg-white/30 text-white rounded-full px-6 py-4 shadow-lg transition text-lg font-semibold backdrop-blur border border-white/30">
+            나도 오늘의 곡 추천받기
+          </button>
+        </Link>
+      </div>
+      
+      <footer className="w-full text-center py-5">
+        <p className="text-sm text-white/60">
+          © 2025 Minu. All rights reserved.
+        </p>
+      </footer>
 
       {/* 토스트 메시지 */}
       {toast && (
