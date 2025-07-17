@@ -497,7 +497,7 @@ export default function TodayPageContent() {
   }, [recommendedSongs, router]);
 
   return (
-    <main className="min-h-screen flex flex-col items-center bg-gradient-to-b from-[#FF2A68] via-[#A033FF] to-[#0B63F6] px-4 overflow-x-hidden">
+    <main className="relative min-h-screen flex flex-col items-center bg-gradient-to-b from-[#FF2A68] via-[#A033FF] to-[#0B63F6] px-4 overflow-x-hidden">
       <div className="flex-grow w-full flex flex-col items-center justify-center">
         <div className={`text-center mb-4 transition-all duration-800 ease-out ${
           isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
@@ -526,6 +526,38 @@ export default function TodayPageContent() {
           © 2025 Minu. All rights reserved.
         </p>
       </footer>
+      
+      {/* 홈으로 돌아가기 버튼 */}
+      <Link href="/" className="absolute bottom-20 left-1/2 -translate-x-1/2 z-30">
+        <button 
+          className="w-12 h-12 bg-white/20 hover:bg-white/30 text-white rounded-full flex items-center justify-center shadow-md transition-all duration-200 border border-white/40 backdrop-blur-sm"
+          aria-label="홈으로 돌아가기"
+        >
+          <svg 
+            width="20" 
+            height="20" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-5 h-5"
+          >
+            <path 
+              d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+            />
+            <polyline 
+              points="9,22 9,12 15,12 15,22" 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+      </Link>
       
       <Toast message={toastMessage} isVisible={isVisible} />
       <style jsx global>{`

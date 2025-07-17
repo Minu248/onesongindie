@@ -2,7 +2,6 @@
 import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
-import { signIn, signOut } from "next-auth/react";
 import { Song } from "@/types/song";
 import { 
   TOAST_MESSAGES, 
@@ -15,14 +14,17 @@ import {
 } from "@/utils/localStorage";
 import { useToast } from "@/utils/hooks/useToast";
 import { useRecommendationManager } from "@/utils/hooks/useRecommendationManager";
+import { useAuth } from "@/utils/hooks/useAuth";
 import { LoadingScreen } from "@/app/components/LoadingScreen";
 import { Toast } from "@/app/components/Toast";
+import Image from "next/image";
 
 export default function HomeContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { toastMessage, showToast, isVisible } = useToast();
   const { canRecommend, recommendCount, processRecommendation } = useRecommendationManager();
+  const { user, loading: authLoading, signInWithGoogle, signOut } = useAuth();
   
   const [isSharedMode, setIsSharedMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -112,7 +114,7 @@ export default function HomeContent() {
         </div>
         
         <button
-          className={`w-32 h-32 ${canRecommend ? 'bg-white/20 hover:bg-white/30' : 'bg-gray-400/20 hover:bg-gray-400/30'} text-white rounded-full shadow-lg transition mb-4 flex items-center justify-center text-4xl border-2 border-white/40 backdrop-blur`}
+          className={`w-32 h-32 md:w-50 md:h-50 ${canRecommend ? 'bg-white/20 hover:bg-white/30' : 'bg-gray-400/20 hover:bg-gray-400/30'} text-white rounded-full shadow-lg transition mb-4 flex items-center justify-center text-4xl md:text-6xl border-2 border-white/40 backdrop-blur`}
           onClick={handleRecommendClick}
           aria-label="오늘의 인디 한 곡 추천받기"
         >
@@ -129,11 +131,41 @@ export default function HomeContent() {
         
         {recommendCount > 0 && (
           <Link href="/today" className="w-full flex justify-center mb-4">
-            <button className="w-full max-w-xs bg-[#A033FF] text-white rounded-full px-6 py-3 shadow-md hover:bg-[#7c25c9] transition text-base font-semibold">
+            <button className="w-full max-w-xs bg-[#A033FF] text-white rounded-full px-6 py-3 shadow-md hover:bg-[#7c25c9] transition text-base font-medium">
               오늘 추천 받은 곡 보기
             </button>
           </Link>
         )}
+        
+        {/* 구글 로그인/로그아웃 버튼 - 일시적으로 숨김 */}
+        {/*
+        {!authLoading && (
+          <div className="mb-6 flex justify-center">
+            {!user ? (
+              <button
+                onClick={() => signInWithGoogle()}
+                className="w-full max-w-xs flex items-center gap-3 bg-white hover:bg-gray-300 text-gray-700 font-medium text-base py-3 px-18 rounded-full shadow-md transition-colors duration-200"
+              >
+                <Image
+                  src="/Google logo.png"
+                  alt="Google logo"
+                  width={20}
+                  height={20}
+                  className="w-5 h-5"
+                />
+                <span>Sign in with Google</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => signOut()}
+                className="w-full max-w-xs bg-white/20 hover:bg-white/30 text-white font-medium text-base py-3 px-6 rounded-full shadow-md transition-colors duration-200 border border-white/40"
+              >
+                로그아웃
+              </button>
+            )}
+          </div>
+        )}
+        */}
       </div>
       
       <footer className="w-full text-center py-5">
