@@ -47,7 +47,36 @@ export default function Playlist() {
           ))}
         </div>
       )}
-      <Link href="/" className="mt-8 text-[#A033FF] underline">홈으로 돌아가기</Link>
+    <Link href="/" className="mt-8 flex justify-center w-full">
+      <button 
+          className="w-12 h-12 bg-white/20 hover:bg-white/30 text-white rounded-full flex items-center justify-center shadow-md transition-all duration-200 border border-white/40 backdrop-blur-sm"
+          aria-label="홈으로 돌아가기"
+        >
+          <svg 
+            width="20" 
+            height="20" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-5 h-5"
+          >
+            <path 
+              d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+            />
+            <polyline 
+              points="9,22 9,12 15,12 15,22" 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+      </Link>
     </main>
   );
 } 
