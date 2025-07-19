@@ -289,17 +289,14 @@ export const SongSlider: React.FC<SongSliderProps> = ({
       return;
     }
     
-    // 세로 스크롤이 가로 스크롤보다 크면 세로 스크롤 차단
-    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-      e.preventDefault();
-      e.stopPropagation();
-      return;
+    // 가로 스크롤이 세로 스크롤보다 클 때만 슬라이드 전환
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+      e.preventDefault(); // 가로 스크롤만 차단
+      const delta = e.deltaX;
+      if (delta > TOUCH_SETTINGS.WHEEL_SENSITIVITY) nextSlide();
+      else if (delta < -TOUCH_SETTINGS.WHEEL_SENSITIVITY) prevSlide();
     }
-    
-    // 가로 스크롤만 처리
-    const delta = e.deltaX;
-    if (delta > TOUCH_SETTINGS.WHEEL_SENSITIVITY) nextSlide();
-    else if (delta < -TOUCH_SETTINGS.WHEEL_SENSITIVITY) prevSlide();
+    // 세로 스크롤은 그대로 통과시킴 (preventDefault 호출하지 않음)
   }, [isAnimating, nextSlide, prevSlide]);
   useEffect(() => { updateSlides(); }, [currentIndex, updateSlides]);
   useEffect(() => {
@@ -363,31 +360,68 @@ export const SongSlider: React.FC<SongSliderProps> = ({
                 )
               )}
             </div>
-            <div className="flex gap-3 justify-center mb-4">
-              <button onClick={() => window.open(getYouTubeMusicUrl(createSearchQuery(song["곡 제목"] || "", song["아티스트"] || "")), '_blank')} className="w-10 h-10 p-1 rounded-[10px] focus:outline-none">
-                <img src="/youtube_music.png" alt="YouTube Music" className="w-full h-full object-contain rounded-[10px]" />
-              </button>
-              <button onClick={() => window.open(getAppleMusicUrl(createSearchQuery(song["곡 제목"] || "", song["아티스트"] || "")), '_blank')} className="w-10 h-10 p-1 rounded-[10px] focus:outline-none">
-                <img src="/apple_music.png" alt="Apple Music" className="w-full h-full object-contain rounded-[10px]" />
-              </button>
-              <button onClick={() => window.open(getSpotifyUrl(createSearchQuery(song["곡 제목"] || "", song["아티스트"] || "")), '_blank')} className="w-10 h-10 p-1 rounded-[10px] focus:outline-none">
-                <img src="/spotify.png" alt="Spotify" className="w-full h-full object-contain rounded-[10px]" />
-              </button>
-              <button onClick={() => window.open(getVibeUrl(createSearchQuery(song["곡 제목"] || "", song["아티스트"] || "")), '_blank')} className="w-10 h-10 p-1 rounded-[10px] focus:outline-none">
-                <img src="/vibe.png" alt="Vibe" className="w-full h-full object-contain rounded-[10px]" />
+            {/* 저장/공유 버튼 그룹 */}
+            <div className="flex gap-2 justify-center mt-2 mb-6">
+              {/*<button 
+                onClick={() => onLike(song)} 
+                className="flex items-center gap-2 bg-[#FF6B9D] hover:bg-[#FF5A8A] text-white px-6 py-3 rounded-full shadow-md transition-colors duration-200"
+              >
+                <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+                <span className="font-medium">저장</span>
+              </button>*/}
+              <button 
+                onClick={() => onShare(song)} 
+                className="flex items-center gap-2 bg-[#3B82F6] hover:bg-[#2563EB] text-white px-6 py-3 rounded-full shadow-md transition-colors duration-200"
+              >
+                <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                  <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/>
+                </svg>
+                <span className="font-medium">공유</span>
               </button>
             </div>
-            <div className="flex gap-4 mb-2 relative">
-              <button onClick={() => onLike(song)} className="w-14 h-14 rounded-[10px] text-2xl flex items-center justify-center bg-white/60 hover:bg-white/80 shadow border border-[#FF2A68] text-[#FF2A68]">❤️</button>
-              <button onClick={() => onShare(song)} className="w-14 h-14 rounded-[10px] text-2xl flex items-center justify-center bg-white/60 hover:bg-white/80 shadow border border-[#0B63F6] text-[#0B63F6]">🔗</button>
+            
+            {/* 플랫폼 버튼 그룹 - 2x2 그리드 */}
+            <div className="grid grid-cols-2 gap-2 w-full mb-0">
+              <button 
+                onClick={() => window.open(getYouTubeMusicUrl(createSearchQuery(song["곡 제목"] || "", song["아티스트"] || "")), '_blank')} 
+                className="flex items-center justify-center gap-2 bg-[#FF0000] hover:bg-[#CC0000] text-white px-4 py-3 rounded-[5px] shadow-md transition-colors duration-200"
+              >
+                <img src="/youtube_music.png" alt="YouTube" className="w-4 h-4 object-contain" />
+                <span className="font-medium text-sm">Youtube</span>
+              </button>
+              <button 
+                onClick={() => window.open(getSpotifyUrl(createSearchQuery(song["곡 제목"] || "", song["아티스트"] || "")), '_blank')} 
+                className="flex items-center justify-center gap-2 bg-[#1DB954] hover:bg-[#1AA34A] text-white px-4 py-3 rounded-[5px] shadow-md transition-colors duration-200"
+              >
+                <img src="/spotify.png" alt="Spotify" className="w-4 h-4 object-contain" />
+                <span className="font-medium text-sm">Spotify</span>
+              </button>
+              <button 
+                onClick={() => window.open(getAppleMusicUrl(createSearchQuery(song["곡 제목"] || "", song["아티스트"] || "")), '_blank')} 
+                className="flex items-center justify-center gap-2 bg-[#000000] hover:bg-[#333333] text-white px-4 py-3 rounded-[5px] shadow-md transition-colors duration-200"
+              >
+                <img src="/apple_music.png" alt="Apple Music" className="w-4 h-4 object-contain" />
+                <span className="font-medium text-sm">Apple Music</span>
+              </button>
+              <button 
+                onClick={() => window.open(getVibeUrl(createSearchQuery(song["곡 제목"] || "", song["아티스트"] || "")), '_blank')} 
+                className="flex items-center justify-center gap-2 bg-[#8B5CF6] hover:bg-[#7C3AED] text-white px-4 py-3 rounded-[5px] shadow-md transition-colors duration-200"
+              >
+                <img src="/vibe.png" alt="Vibe" className="w-4 h-4 object-contain" />
+                <span className="font-medium text-sm">Vibe</span>
+              </button>
             </div>
-            <Link href="/playlist" className="text-[#A033FF] underline mt-2">내 플레이리스트 보기</Link>
-            <div className="w-full flex flex-col gap-4 mt-6">
-              <Link href="/today/songs" className="w-full">
+            {/*<Link href="/playlist" className="text-[#A033FF] underline mt-2">내 플레이리스트 보기</Link>
+            {/* 버튼들 숨김 처리*/}
+            <div className="w-full flex flex-col gap-4 mt-2">
+              {/*<Link href="/today/songs" className="w-full">
                 <button className="w-full bg-[#A033FF] text-white rounded-full px-6 py-3 shadow-md hover:bg-[#7c25c9] transition text-base font-semibold">오늘 추천 받은 곡 리스트</button>
               </Link>
+            */}
               <a href={API_ENDPOINTS.FORM_SUBMIT} target="_blank" rel="noopener noreferrer" className="w-full">
-                <button className="w-full bg-[#fc26d5] text-white rounded-full px-6 py-3 shadow-md hover:bg-[#7c25c9] transition text-base font-semibold">나만 알고 있는 인디 노래 제보하기</button>
+                <button className="w-full bg-[#fc26d5] text-white rounded-[5px] px-6 py-3 shadow-md hover:bg-[#7c25c9] transition text-base font-semibold">나만 알고 있는 인디 노래 제보하기</button>
               </a>
             </div>
           </div>

@@ -153,7 +153,7 @@ export default function TodayPageContent() {
         <div className={`mb-8 md:mb-2 text-white/90 text-base text-center font-medium transition-all duration-800 ease-out ${
           isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
         }`} style={{ transitionDelay: '400ms' }}>하루에 한 번 10곡의 음악을 추천 받을 수 있어요</div>
-        <div className="w-full max-w-2xl mb-6 mt-10 md:mb-16 md:mt-32 relative h-[700px] z-20">
+        <div className="w-full max-w-2xl mb-6 mt-10 md:mb-16 md:mt-32 relative h-[650px] z-20">
           <SongSlider 
             songsData={recommendedSongs}
             isYouTubeAPIReady={isYouTubeAPIReady}
