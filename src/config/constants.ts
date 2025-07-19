@@ -44,9 +44,14 @@ export const TOUCH_SETTINGS = {
 export const MUSIC_PLATFORM_URLS = {
   YOUTUBE_MUSIC: "https://music.youtube.com/search?q=",
   APPLE_MUSIC: "https://music.apple.com/search?term=",
-  SPOTIFY: "https://open.spotify.com/search/",
   VIBE: "https://vibe.naver.com/search?query=",
   MELON: "https://www.melon.com/search/total/index.htm?q=",
+} as const;
+
+// Spotify 플랫폼 URL (PC/모바일 분리)
+export const SPOTIFY_URLS = {
+  PC: "https://open.spotify.com/search/",
+  MOBILE: "https://open.spotify.com/search/results/",
 } as const;
 
 // API 엔드포인트

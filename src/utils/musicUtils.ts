@@ -1,4 +1,4 @@
-import { MUSIC_PLATFORM_URLS } from "@/config/constants";
+import { MUSIC_PLATFORM_URLS, SPOTIFY_URLS } from "@/config/constants";
 
 /**
  * YouTube URL에서 비디오 ID를 추출합니다
@@ -21,7 +21,12 @@ export const getAppleMusicUrl = (query: string): string => {
 };
 
 export const getSpotifyUrl = (query: string): string => {
-  return MUSIC_PLATFORM_URLS.SPOTIFY + encodeURIComponent(query);
+  // 모바일 환경 감지
+  const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  
+  // PC/모바일 환경에 따라 적절한 URL 선택
+  const baseUrl = isMobile ? SPOTIFY_URLS.MOBILE : SPOTIFY_URLS.PC;
+  return baseUrl + encodeURIComponent(query);
 };
 
 export const getVibeUrl = (query: string): string => {
