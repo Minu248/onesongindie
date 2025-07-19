@@ -91,12 +91,21 @@ export const SongSlider: React.FC<SongSliderProps> = ({
   }, [currentIndex, songs.length, isSliderLoaded]);
 
   const prevSlide = () => {
+    if (isAnimating) return; // 애니메이션 중이면 중복 실행 방지
     const len = songs.length;
+    setIsAnimating(true);
     setCurrentIndex((prev) => (prev - 1 + len) % len);
+    // 애니메이션 완료 후 상태 초기화
+    setTimeout(() => setIsAnimating(false), 700); // transition duration과 동일
   };
+  
   const nextSlide = () => {
+    if (isAnimating) return; // 애니메이션 중이면 중복 실행 방지
     const len = songs.length;
+    setIsAnimating(true);
     setCurrentIndex((prev) => (prev + 1) % len);
+    // 애니메이션 완료 후 상태 초기화
+    setTimeout(() => setIsAnimating(false), 700); // transition duration과 동일
   };
 
   // YouTube 플레이어 생성 함수
@@ -207,6 +216,7 @@ export const SongSlider: React.FC<SongSliderProps> = ({
   // 터치/마우스/휠 이벤트 핸들러
   const [touchStartY, setTouchStartY] = useState(0);
   const [touchEndY, setTouchEndY] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
   
   const handleTouchStart = (e: React.TouchEvent) => {
     setTouchStart(e.targetTouches[0].clientX);
@@ -214,16 +224,18 @@ export const SongSlider: React.FC<SongSliderProps> = ({
     setTouchStartY(e.targetTouches[0].clientY);
     setTouchEndY(e.targetTouches[0].clientY);
   };
+  
   const handleTouchMove = (e: React.TouchEvent) => {
     setTouchEnd(e.targetTouches[0].clientX);
     setTouchEndY(e.targetTouches[0].clientY);
     
-    // 가로 스와이프가 감지되면 기본 스크롤 방지
+    // 슬라이드 애니메이션 중이거나 가로 스와이프가 감지되면 모든 스크롤 방지
     const swipeDistanceX = Math.abs(e.targetTouches[0].clientX - touchStart);
     const swipeDistanceY = Math.abs(e.targetTouches[0].clientY - touchStartY);
     
-    if (swipeDistanceX > swipeDistanceY && swipeDistanceX > 20) {
+    if (isAnimating || (swipeDistanceX > swipeDistanceY && swipeDistanceX > 20)) {
       e.preventDefault();
+      e.stopPropagation();
     }
   };
   const handleTouchEnd = () => {
@@ -270,38 +282,44 @@ export const SongSlider: React.FC<SongSliderProps> = ({
       return;
     }
     
-    // 가로 스크롤만 처리 (세로 스크롤 무시)
-    if (Math.abs(e.deltaX) < Math.abs(e.deltaY)) {
+    // 애니메이션 중이면 모든 스크롤 차단
+    if (isAnimating) {
+      e.preventDefault();
+      e.stopPropagation();
       return;
     }
     
+    // 세로 스크롤이 가로 스크롤보다 크면 세로 스크롤 차단
+    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    
+    // 가로 스크롤만 처리
     const delta = e.deltaX;
     if (delta > TOUCH_SETTINGS.WHEEL_SENSITIVITY) nextSlide();
     else if (delta < -TOUCH_SETTINGS.WHEEL_SENSITIVITY) prevSlide();
-  }, []);
-  const debounce = <F extends (...args: any[]) => any>(func: F, delay: number) => {
-    let timeoutId: NodeJS.Timeout;
-    return (...args: Parameters<F>) => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => func(...args), delay);
-    };
-  };
-  const debouncedHandleWheel = useCallback(
-    debounce((e: WheelEvent) => handleWheel(e), 200),
-    [handleWheel]
-  );
+  }, [isAnimating, nextSlide, prevSlide]);
   useEffect(() => { updateSlides(); }, [currentIndex, updateSlides]);
   useEffect(() => {
     updateSlides();
     const container = containerRef.current;
-    if (container) container.addEventListener('wheel', debouncedHandleWheel, { passive: false });
-    return () => { if (container) container.removeEventListener('wheel', debouncedHandleWheel); };
-  }, [updateSlides, debouncedHandleWheel]);
+    if (container) container.addEventListener('wheel', handleWheel, { passive: false });
+    return () => { if (container) container.removeEventListener('wheel', handleWheel); };
+  }, [updateSlides, handleWheel]);
 
   return (
     <div 
       ref={containerRef}
       className="slider-container relative w-full h-full perspective-1000 overflow-visible"
+      style={{
+        // 애니메이션 중 스크롤 방지
+        ...(isAnimating && {
+          overscrollBehavior: 'none',
+          touchAction: 'none'
+        })
+      }}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
@@ -379,7 +397,17 @@ export const SongSlider: React.FC<SongSliderProps> = ({
       <button onClick={nextSlide} className="next-btn absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-[#fc1eaf]/70 hover:bg-white text-white rounded-full w-12 h-12 flex items-center justify-center shadow transition md:block hidden" aria-label="다음 슬라이드">▶</button>
       <div className="flex justify-center gap-2 absolute bottom-26 md:bottom-12 left-0 right-0">
         {songs.map((_, idx) => (
-          <button key={idx} onClick={() => setCurrentIndex(idx)} className={`w-3 h-3 rounded-full transition-all ${idx === currentIndex ? 'bg-white' : 'bg-white/30'}`} aria-label={`${idx + 1}번 슬라이드로 이동`} />
+          <button 
+            key={idx} 
+            onClick={() => {
+              if (isAnimating || idx === currentIndex) return; // 애니메이션 중이거나 현재 슬라이드면 무시
+              setIsAnimating(true);
+              setCurrentIndex(idx);
+              setTimeout(() => setIsAnimating(false), 700);
+            }} 
+            className={`w-3 h-3 rounded-full transition-all ${idx === currentIndex ? 'bg-white' : 'bg-white/30'}`} 
+            aria-label={`${idx + 1}번 슬라이드로 이동`} 
+          />
         ))}
       </div>
     </div>
