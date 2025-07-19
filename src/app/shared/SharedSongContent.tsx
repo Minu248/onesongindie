@@ -2,14 +2,9 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-
-// YouTube IFrame API 타입 정의
-declare global {
-  interface Window {
-    YT: any;
-    onYouTubeIframeAPIReady: () => void;
-  }
-}
+import { Footer } from "@/app/components/Footer";
+import { useYouTubeAPI } from "@/utils/hooks/useYouTubeAPI";
+import { getYoutubeId } from "@/utils/musicUtils";
 
 interface Song {
   "곡 제목": string;
@@ -21,35 +16,7 @@ export default function SharedSongContent() {
   const searchParams = useSearchParams();
   const [song, setSong] = useState<Song | null>(null);
   const [toast, setToast] = useState("");
-  const [isYouTubeAPIReady, setIsYouTubeAPIReady] = useState(false);
-
-  // YouTube IFrame API 로드
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    
-    // 이미 로드된 경우
-    if (window.YT && window.YT.Player) {
-      setIsYouTubeAPIReady(true);
-      return;
-    }
-    
-    // API 스크립트 로드
-    const script = document.createElement('script');
-    script.src = 'https://www.youtube.com/iframe_api';
-    script.async = true;
-    document.head.appendChild(script);
-    
-    // API 준비 완료 콜백
-    window.onYouTubeIframeAPIReady = () => {
-      setIsYouTubeAPIReady(true);
-    };
-    
-    return () => {
-      if (document.head.contains(script)) {
-        document.head.removeChild(script);
-      }
-    };
-  }, []);
+  const { isYouTubeAPIReady, error } = useYouTubeAPI();
 
   // URL 파라미터에서 곡 정보 가져오기
   useEffect(() => {
@@ -66,12 +33,7 @@ export default function SharedSongContent() {
     }
   }, [searchParams]);
 
-  // 유튜브 ID 추출 함수
-  const getYoutubeId = (url: string) => {
-    if (!url || typeof url !== 'string') return null;
-    const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)?)([\w-]{11})/);
-    return match ? match[1] : null;
-  };
+
 
 
 
@@ -129,11 +91,7 @@ export default function SharedSongContent() {
         </Link>
       </div>
       
-      <footer className="w-full text-center py-5">
-        <p className="text-sm text-white/60">
-          © 2025 Minu. All rights reserved.
-        </p>
-      </footer>
+      <Footer />
 
       {/* 토스트 메시지 */}
       {toast && (

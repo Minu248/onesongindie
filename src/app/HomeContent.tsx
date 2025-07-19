@@ -17,6 +17,7 @@ import { useRecommendationManager } from "@/utils/hooks/useRecommendationManager
 import { useAuth } from "@/utils/hooks/useAuth";
 import { LoadingScreen } from "@/app/components/LoadingScreen";
 import { Toast } from "@/app/components/Toast";
+import { Footer } from "@/app/components/Footer";
 import Image from "next/image";
 
 export default function HomeContent() {
@@ -168,11 +169,7 @@ export default function HomeContent() {
         */}
       </div>
       
-      <footer className="w-full text-center py-5">
-        <p className="text-sm text-white/60">
-          © 2025 Minu. All rights reserved.
-        </p>
-      </footer>
+      <Footer />
       
       <Toast message={toastMessage} isVisible={isVisible} />
     </main>
