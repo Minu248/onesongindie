@@ -45,7 +45,6 @@ export const MUSIC_PLATFORM_URLS = {
   YOUTUBE_MUSIC: "https://music.youtube.com/search?q=",
   APPLE_MUSIC: "https://music.apple.com/search?term=",
   VIBE: "https://vibe.naver.com/search?query=",
-  MELON: "https://www.melon.com/search/total/index.htm?q=",
 } as const;
 
 // Spotify 플랫폼 URL (PC/모바일 분리)
@@ -53,6 +52,19 @@ export const SPOTIFY_URLS = {
   PC: "https://open.spotify.com/search/",
   MOBILE: "https://open.spotify.com/search/results/",
 } as const;
+
+// Bugs 플랫폼 URL (PC/모바일 분리)
+export const BUGS_URLS = {
+  PC: "https://music.bugs.co.kr/search/integrated?q=",
+  MOBILE: "https://m.bugs.co.kr/search/track?q=",
+} as const;
+
+// Melon 플랫폼 URL (PC/모바일 분리)
+export const MELON_URLS = {
+  PC: "https://www.melon.com/search/total/index.htm?q=",
+  MOBILE: "https://search.melon.com/search/searchMcom.htm?s=",
+} as const;
+
 
 // API 엔드포인트
 export const API_ENDPOINTS = {

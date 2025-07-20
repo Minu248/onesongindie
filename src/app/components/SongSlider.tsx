@@ -13,6 +13,8 @@ import {
   getAppleMusicUrl, 
   getSpotifyUrl, 
   getVibeUrl,
+  getMelonUrl,
+  getBugsUrl,
   getYouTubeThumbnailUrl,
   createSearchQuery 
 } from "@/utils/musicUtils";
@@ -383,13 +385,13 @@ export const SongSlider: React.FC<SongSliderProps> = ({
             </div>
             
             {/* 플랫폼 버튼 그룹 - 2x2 그리드 */}
-            <div className="grid grid-cols-2 gap-2 w-full mb-0">
+            <div className="grid grid-cols-3 gap-2 w-full mb-0">
               <button 
                 onClick={() => window.open(getYouTubeMusicUrl(createSearchQuery(song["곡 제목"] || "", song["아티스트"] || "")), '_blank')} 
                 className="flex items-center justify-center gap-2 bg-[#FF0000] hover:bg-[#CC0000] text-white px-4 py-3 rounded-[5px] shadow-md transition-colors duration-200"
               >
                 <img src="/youtube_music.png" alt="YouTube" className="w-4 h-4 rounded-[3px] object-contain" />
-                <span className="font-medium text-sm">Youtube Music</span>
+                <span className="font-medium text-sm">Youtube</span>
               </button>
               <button 
                 onClick={() => window.open(getSpotifyUrl(createSearchQuery(song["곡 제목"] || "", song["아티스트"] || "")), '_blank')} 
@@ -403,7 +405,7 @@ export const SongSlider: React.FC<SongSliderProps> = ({
                 className="flex items-center justify-center gap-2 bg-[#000000] hover:bg-[#333333] text-white px-4 py-3 rounded-[5px] shadow-md transition-colors duration-200"
               >
                 <img src="/apple_music.png" alt="Apple Music" className="w-4 h-4 rounded-[3px] object-contain" />
-                <span className="font-medium text-sm">Apple Music</span>
+                <span className="font-medium text-sm">Apple</span>
               </button>
               <button 
                 onClick={() => window.open(getVibeUrl(createSearchQuery(song["곡 제목"] || "", song["아티스트"] || "")), '_blank')} 
@@ -411,6 +413,20 @@ export const SongSlider: React.FC<SongSliderProps> = ({
               >
                 <img src="/vibe.png" alt="Vibe" className="w-4 h-4 rounded-[3px] object-contain" />
                 <span className="font-medium text-sm">Vibe</span>
+              </button>
+              <button 
+                onClick={() => window.open(getMelonUrl(createSearchQuery(song["곡 제목"] || "", song["아티스트"] || "")), '_blank')} 
+                className="flex items-center justify-center gap-2 bg-[#04E632] hover:bg-[#00b825] text-white px-4 py-3 rounded-[5px] shadow-md transition-colors duration-200"
+              >
+                <img src="/melon.png" alt="Melon" className="w-4 h-4 rounded-[3px] object-contain" />
+                <span className="font-medium text-sm">Melon</span>
+              </button>
+              <button 
+                onClick={() => window.open(getBugsUrl(createSearchQuery(song["곡 제목"] || "", song["아티스트"] || "")), '_blank')} 
+                className="flex items-center justify-center gap-2 bg-[#ED2653] hover:bg-[#c42146] text-white px-4 py-3 rounded-[5px] shadow-md transition-colors duration-200"
+              >
+                <img src="/bugs.png" alt="Bugs" className="w-4 h-4 rounded-[3px] object-contain" />
+                <span className="font-medium text-sm">Bugs</span>
               </button>
             </div>
             {/*<Link href="/playlist" className="text-[#A033FF] underline mt-2">내 플레이리스트 보기</Link>
@@ -421,7 +437,7 @@ export const SongSlider: React.FC<SongSliderProps> = ({
               </Link>
             */}
               <a href={API_ENDPOINTS.FORM_SUBMIT} target="_blank" rel="noopener noreferrer" className="w-full">
-                <button className="w-full bg-[#fc26d5] text-white rounded-[5px] px-6 py-3 shadow-md hover:bg-[#7c25c9] transition text-base font-medium">📫나만 알고 있는 인디 노래 제보하기</button>
+                <button className="w-full bg-[#7a7a7a] text-white rounded-[5px] px-6 py-3 shadow-md hover:bg-[#696969] transition text-base font-medium">📫나만 알고 있는 인디 노래 제보하기</button>
               </a>
             </div>
           </div>

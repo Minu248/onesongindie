@@ -1,4 +1,4 @@
-import { MUSIC_PLATFORM_URLS, SPOTIFY_URLS } from "@/config/constants";
+import { MUSIC_PLATFORM_URLS, SPOTIFY_URLS, MELON_URLS, BUGS_URLS } from "@/config/constants";
 
 /**
  * YouTube URL에서 비디오 ID를 추출합니다
@@ -7,6 +7,13 @@ export const getYoutubeId = (url: string): string | null => {
   if (!url || typeof url !== 'string') return null;
   const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)?)([\w-]{11})/);
   return match ? match[1] : null;
+};
+
+/**
+ * 모바일 환경인지 감지합니다
+ */
+const isMobileDevice = (): boolean => {
+  return /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 };
 
 /**
@@ -21,11 +28,7 @@ export const getAppleMusicUrl = (query: string): string => {
 };
 
 export const getSpotifyUrl = (query: string): string => {
-  // 모바일 환경 감지
-  const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-  
-  // PC/모바일 환경에 따라 적절한 URL 선택
-  const baseUrl = isMobile ? SPOTIFY_URLS.MOBILE : SPOTIFY_URLS.PC;
+  const baseUrl = isMobileDevice() ? SPOTIFY_URLS.MOBILE : SPOTIFY_URLS.PC;
   return baseUrl + encodeURIComponent(query);
 };
 
@@ -34,7 +37,13 @@ export const getVibeUrl = (query: string): string => {
 };
 
 export const getMelonUrl = (query: string): string => {
-  return MUSIC_PLATFORM_URLS.MELON + encodeURIComponent(query);
+  const baseUrl = isMobileDevice() ? MELON_URLS.MOBILE : MELON_URLS.PC;
+  return baseUrl + encodeURIComponent(query);
+};
+
+export const getBugsUrl = (query: string): string => {
+  const baseUrl = isMobileDevice() ? BUGS_URLS.MOBILE : BUGS_URLS.PC;
+  return baseUrl + encodeURIComponent(query);
 };
 
 /**
