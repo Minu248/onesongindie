@@ -388,28 +388,28 @@ export const SongSlider: React.FC<SongSliderProps> = ({
                 onClick={() => window.open(getYouTubeMusicUrl(createSearchQuery(song["곡 제목"] || "", song["아티스트"] || "")), '_blank')} 
                 className="flex items-center justify-center gap-2 bg-[#FF0000] hover:bg-[#CC0000] text-white px-4 py-3 rounded-[5px] shadow-md transition-colors duration-200"
               >
-                <img src="/youtube_music.png" alt="YouTube" className="w-4 h-4 object-contain" />
-                <span className="font-medium text-sm">Youtube</span>
+                <img src="/youtube_music.png" alt="YouTube" className="w-4 h-4 rounded-[3px] object-contain" />
+                <span className="font-medium text-sm">Youtube Music</span>
               </button>
               <button 
                 onClick={() => window.open(getSpotifyUrl(createSearchQuery(song["곡 제목"] || "", song["아티스트"] || "")), '_blank')} 
                 className="flex items-center justify-center gap-2 bg-[#1DB954] hover:bg-[#1AA34A] text-white px-4 py-3 rounded-[5px] shadow-md transition-colors duration-200"
               >
-                <img src="/spotify.png" alt="Spotify" className="w-4 h-4 object-contain" />
+                <img src="/spotify.png" alt="Spotify" className="w-4 h-4 rounded-[3px] object-contain" />
                 <span className="font-medium text-sm">Spotify</span>
               </button>
               <button 
                 onClick={() => window.open(getAppleMusicUrl(createSearchQuery(song["곡 제목"] || "", song["아티스트"] || "")), '_blank')} 
                 className="flex items-center justify-center gap-2 bg-[#000000] hover:bg-[#333333] text-white px-4 py-3 rounded-[5px] shadow-md transition-colors duration-200"
               >
-                <img src="/apple_music.png" alt="Apple Music" className="w-4 h-4 object-contain" />
+                <img src="/apple_music.png" alt="Apple Music" className="w-4 h-4 rounded-[3px] object-contain" />
                 <span className="font-medium text-sm">Apple Music</span>
               </button>
               <button 
                 onClick={() => window.open(getVibeUrl(createSearchQuery(song["곡 제목"] || "", song["아티스트"] || "")), '_blank')} 
                 className="flex items-center justify-center gap-2 bg-[#8B5CF6] hover:bg-[#7C3AED] text-white px-4 py-3 rounded-[5px] shadow-md transition-colors duration-200"
               >
-                <img src="/vibe.png" alt="Vibe" className="w-4 h-4 object-contain" />
+                <img src="/vibe.png" alt="Vibe" className="w-4 h-4 rounded-[3px] object-contain" />
                 <span className="font-medium text-sm">Vibe</span>
               </button>
             </div>
@@ -421,7 +421,7 @@ export const SongSlider: React.FC<SongSliderProps> = ({
               </Link>
             */}
               <a href={API_ENDPOINTS.FORM_SUBMIT} target="_blank" rel="noopener noreferrer" className="w-full">
-                <button className="w-full bg-[#fc26d5] text-white rounded-[5px] px-6 py-3 shadow-md hover:bg-[#7c25c9] transition text-base font-semibold">나만 알고 있는 인디 노래 제보하기</button>
+                <button className="w-full bg-[#fc26d5] text-white rounded-[5px] px-6 py-3 shadow-md hover:bg-[#7c25c9] transition text-base font-medium">📫나만 알고 있는 인디 노래 제보하기</button>
               </a>
             </div>
           </div>
