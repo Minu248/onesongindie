@@ -414,13 +414,13 @@ export const SongSlider: React.FC<SongSliderProps> = ({
                 <img src="/vibe.png" alt="Vibe" className="w-4 h-4 rounded-[3px] object-contain" />
                 <span className="font-medium text-sm">Vibe</span>
               </button>
-              <button 
+              {/*<button 
                 onClick={() => window.open(getMelonUrl(createSearchQuery(song["곡 제목"] || "", song["아티스트"] || "")), '_blank')} 
                 className="flex items-center justify-center gap-2 bg-[#04E632] hover:bg-[#00b825] text-white px-4 py-3 rounded-[5px] shadow-md transition-colors duration-200"
               >
                 <img src="/melon.png" alt="Melon" className="w-4 h-4 rounded-[3px] object-contain" />
                 <span className="font-medium text-sm">Melon</span>
-              </button>
+              </button>*/}
               <button 
                 onClick={() => window.open(getBugsUrl(createSearchQuery(song["곡 제목"] || "", song["아티스트"] || "")), '_blank')} 
                 className="flex items-center justify-center gap-2 bg-[#ED2653] hover:bg-[#c42146] text-white px-4 py-3 rounded-[5px] shadow-md transition-colors duration-200"
@@ -437,7 +437,7 @@ export const SongSlider: React.FC<SongSliderProps> = ({
               </Link>
             */}
               <a href={API_ENDPOINTS.FORM_SUBMIT} target="_blank" rel="noopener noreferrer" className="w-full">
-                <button className="w-full bg-[#7a7a7a] text-white rounded-[5px] px-6 py-3 shadow-md hover:bg-[#696969] transition text-base font-medium">📫나만 알고 있는 인디 노래 제보하기</button>
+                <button className="w-full bg-[#EC3C89] text-white rounded-[5px] px-6 py-3 shadow-md hover:bg-[#e32075] transition text-base font-medium">📫나만 알고 있는 인디 노래 제보하기</button>
               </a>
             </div>
           </div>
